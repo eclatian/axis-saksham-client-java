@@ -1,4 +1,3 @@
-
 package com.eclatian.oss.axis.saksham.client.base;
 
 import com.eclatian.oss.axis.saksham.client.SakshamManager;
@@ -21,38 +20,41 @@ import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
- * The {@code BaseService} class is an abstract class that provides common functionality for service classes
- * handling Axis requests.
+ * The {@code BaseService} class is an abstract class that provides common functionality for service classes handling
+ * Axis requests.
  *
- * <p>The class declares the following fields:</p>
+ * <p>
+ * The class declares the following fields:</p>
  * <ul>
- *   <li>{@code logger}: The logger instance for logging purposes.</li>
- *   <li>{@code parser}: The AParser instance for JSON parsing.</li>
+ * <li>{@code logger}: The logger instance for logging purposes.</li>
+ * <li>{@code parser}: The AParser instance for JSON parsing.</li>
  * </ul>
  *
- * <p>The class provides the following methods:</p>
+ * <p>
+ * The class provides the following methods:</p>
  * <ul>
- *   <li>{@link #trigger(Request)}: Triggers the Axis request and returns the response.
- *     <ul>
- *       <li>Description: Validates the request, converts it to JSON format based on the options,
- *           and makes the API request. It returns the parsed response or logs an error if an exception occurs.</li>
- *       <li>Parameters:
- *         <ul>
- *           <li>{@code request}: The Axis request to be triggered.</li>
- *         </ul>
- *       </li>
- *       <li>Returns: The Axis response object.</li>
- *     </ul>
- *   </li>
+ * <li>{@link #trigger(Request)}: Triggers the Axis request and returns the response.
+ * <ul>
+ * <li>Description: Validates the request, converts it to JSON format based on the options, and makes the API request.
+ * It returns the parsed response or logs an error if an exception occurs.</li>
+ * <li>Parameters:
+ * <ul>
+ * <li>{@code request}: The Axis request to be triggered.</li>
+ * </ul>
+ * </li>
+ * <li>Returns: The Axis response object.</li>
+ * </ul>
+ * </li>
  * </ul>
  *
- * <p>The class also includes private helper methods for request validation, making the API request,
- * retrieving the API path, and parsing the response object.</p>
+ * <p>
+ * The class also includes private helper methods for request validation, making the API request, retrieving the API
+ * path, and parsing the response object.</p>
  *
- * <p>Note: This is an abstract class, and concrete service classes should extend it and implement the
- * necessary abstract methods.</p>
+ * <p>
+ * Note: This is an abstract class, and concrete service classes should extend it and implement the necessary abstract
+ * methods.</p>
  *
  * @param <K> The type parameter representing the Axis request.
  * @param <V> The type parameter representing the Axis response.
@@ -104,7 +106,7 @@ public abstract class BaseService<K extends Request, V extends Response> {
             StringBuilder message = new StringBuilder();
             for (ConstraintViolation<K> violation : violations) {
                 message.append(violation.getPropertyPath()).append(": ").append(violation
-                        .getMessage()).append(",");
+                    .getMessage()).append(",");
             }
             throw new SakshamClientException(message.toString());
         }
@@ -123,7 +125,7 @@ public abstract class BaseService<K extends Request, V extends Response> {
         logger.debug("Client secret = " + SakshamManager.INSTANCE.getOptions().getClientSecret());
         httpPost.setHeader("X-IBM-Client-Id", SakshamManager.INSTANCE.getOptions().getClientId());
         httpPost.setHeader("X-IBM-Client-Secret", SakshamManager.INSTANCE.getOptions()
-                .getClientSecret());
+            .getClientSecret());
         httpPost.setEntity(new StringEntity(requestJson, ContentType.APPLICATION_JSON));
         logger.debug("Request URL = " + httpPost.toString());
         HttpResponse response = null;
@@ -131,20 +133,25 @@ public abstract class BaseService<K extends Request, V extends Response> {
             response = client.execute(httpPost);
         } catch (IOException ex) {
             throw new SakshamClientException("Could not make a successful API call. Verify your IP"
-                    + " address is whitelisted and you are using mTLS properly.", ex);
+                + " address is whitelisted and you are using mTLS properly.", ex);
         }
         logger.debug("Status code = " + response.getStatusLine().getStatusCode());
-        HttpEntity entity2 = response.getEntity();
+        this.validateResponse(response);
+        String responseString = this.convertHttpResponseToString(response);
+        logger.debug("Valid reponse String : " + responseString);
 
+        return parseObject(responseString);
+    }
+
+    private String convertHttpResponseToString(HttpResponse response) throws SakshamClientException {
+        HttpEntity entity2 = response.getEntity();
         String responseString;
         try {
             responseString = EntityUtils.toString(entity2, "UTF-8");
         } catch (IOException | ParseException ex) {
             throw new SakshamClientException("Could not convert the API response to String.", ex);
         }
-        logger.debug(responseString);
-
-        return parseObject(responseString);
+        return responseString;
     }
 
     private String getAPIPath() {
@@ -161,6 +168,9 @@ public abstract class BaseService<K extends Request, V extends Response> {
         } catch (SakshamClientException ex) {
             throw new SakshamClientException("Could not parse the response JSON.", ex);
         }
+        if (response.getErrorMessage() != null) {
+            throw new SakshamClientException(response.getErrorMessage());
+        }
         return response;
     }
 
@@ -171,5 +181,28 @@ public abstract class BaseService<K extends Request, V extends Response> {
      */
     private Class<V> getReponseType() {
         return (Class<V>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[1];
+    }
+
+    private void validateResponse(HttpResponse httpResponse) throws SakshamClientException {
+        switch (httpResponse.getStatusLine().getStatusCode()) {
+            case 200:
+                return;
+            case 503:
+                this.convert503ToException(httpResponse);
+                break;
+
+        }
+    }
+
+    private void convert503ToException(HttpResponse httpResponse) throws SakshamClientException {
+        String responseString = this.convertHttpResponseToString(httpResponse);
+        logger.debug("Error 503 reponse String : " + responseString);
+        String sb = "httpCode: CODE | httpMessage: MSG | errorCode: ERR "
+            + "| moreInformation: INFO";
+        sb = sb.replace("CODE", parser.getJsonValue(responseString, "httpCode"))
+            .replace("MSG", parser.getJsonValue(responseString, "httpMessage"))
+            .replace("ERR", parser.getJsonValue(responseString, "errorCode"))
+            .replace("INFO", parser.getJsonValue(responseString, "moreInformation"));
+        throw new SakshamClientException(sb);
     }
 }

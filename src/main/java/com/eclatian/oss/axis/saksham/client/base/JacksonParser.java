@@ -13,6 +13,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.cfg.CoercionAction;
+import com.fasterxml.jackson.databind.cfg.CoercionInputShape;
+import com.fasterxml.jackson.databind.type.LogicalType;
 import java.util.LinkedHashMap;
 import java.util.UUID;
 import java.util.logging.Level;
@@ -53,6 +56,13 @@ public class JacksonParser extends AParser {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    public JacksonParser() {
+        objectMapper.coercionConfigFor(LogicalType.POJO).setCoercion(CoercionInputShape
+            .EmptyString, CoercionAction.AsEmpty);
+    }
+    
+    
 
     /**
      * Generates the JSON for an encrypted request.
@@ -221,12 +231,7 @@ public class JacksonParser extends AParser {
     
     private String getDataJsonString(String json, Class type, JsonTagsData td) 
         throws SakshamClientException {
-        JsonNode jsonNode;
-        try {
-            jsonNode = objectMapper.readTree(json);
-        } catch (JsonProcessingException ex) {
-            throw new SakshamClientException("Could not read data josn for type  " + type ,ex);
-        }   
+        JsonNode jsonNode = readJsonKey(json, type);   
         String status = jsonNode.get("status").asText();
         if ("F".equals(status)) {
             String error = jsonNode.get("message").asText();
@@ -237,6 +242,16 @@ public class JacksonParser extends AParser {
         logger.debug("Data json = " + dataJson);
         return dataJson;
     }
+
+    private JsonNode readJsonKey(String json, Class type) throws SakshamClientException {
+        JsonNode jsonNode;
+        try {
+            jsonNode = objectMapper.readTree(json);
+        } catch (JsonProcessingException ex) {
+            throw new SakshamClientException("Could not read data josn for type  " + type ,ex);
+        }
+        return jsonNode;
+    }
     
     @Override
     public LinkedHashMap<String, Object> getMap(Object request) {
@@ -244,5 +259,13 @@ public class JacksonParser extends AParser {
             new TypeReference<LinkedHashMap<String, Object>>() {
         });
 
+    }
+
+    @Override
+    protected String getJsonValue(String json, String key) throws SakshamClientException {
+        JsonNode jsonNode = readJsonKey(json, String.class);   
+        String value = jsonNode.get(key).asText();
+        logger.debug("Key = {} Value = {}", key, value);
+        return value;
     }
 }

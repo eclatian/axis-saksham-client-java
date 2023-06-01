@@ -10,7 +10,6 @@ import com.eclatian.oss.axis.saksham.client.transferpayments.TransferPaymentServ
 import com.eclatian.oss.axis.saksham.client.transferpayments.TxnPayMode;
 import java.io.FileInputStream;
 import java.util.ArrayList;
-import org.slf4j.impl.SimpleLogger;
 
 /**
  *
@@ -20,7 +19,7 @@ public class AxisSakshamClient {
 
     public static void main(String[] args) throws Exception {
         
-        System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "DEBUG");
+        //System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "DEBUG");
         //Logger logger = LoggerFactory.getLogger(AxisSakshamClient.class);
     
         //logger.debug("Hello World!");

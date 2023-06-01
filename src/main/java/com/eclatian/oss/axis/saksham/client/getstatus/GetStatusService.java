@@ -4,13 +4,15 @@
  */
 package com.eclatian.oss.axis.saksham.client.getstatus;
 
+import com.eclatian.oss.axis.saksham.client.annotation.AxisAPI;
 import com.eclatian.oss.axis.saksham.client.base.BaseService;
 
 /**
  *
  * @author Abhideep
  */
-public class GetStatusService extends BaseService {
+@AxisAPI(path = "/acct-recon/get-status")
+public class GetStatusService extends BaseService<GetStatusRequest, GetStatusResponse> {
 
    
     

@@ -11,7 +11,7 @@ import com.eclatian.oss.axis.saksham.client.base.BaseService;
  *
  * @author Abhideep
  */
-@AxisAPI(path = "/payments/transferpayment")
+@AxisAPI(path = "/payments/transfer-payment")
 public class TransferPaymentService extends BaseService<TransferPaymentRequest, TransferPaymentResponse> {
 
     

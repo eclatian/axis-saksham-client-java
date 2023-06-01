@@ -9,8 +9,7 @@ import com.eclatian.oss.axis.saksham.client.SakshamEnv;
 import com.eclatian.oss.axis.saksham.client.SakshamManager;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.impl.SimpleLogger;
 
 /**
  *
@@ -19,6 +18,7 @@ import java.util.logging.Logger;
 public class TestUtil {
     
     public static void initialize()  {
+        System.setProperty(SimpleLogger.DEFAULT_LOG_LEVEL_KEY, "DEBUG");
         String certPath = System.getenv("axis-saksham-cert-path");
         String clientId = System.getenv("axis-saksham-clientId");
         String secret = System.getenv("axis-saksham-secret");
@@ -41,7 +41,7 @@ public class TestUtil {
                 .hideRequestRawJson(true)
                 .build();
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(TestUtil.class.getName()).log(Level.SEVERE, null, ex);
+            
         }
 
         SakshamManager.INSTANCE.initialize(pOptions);

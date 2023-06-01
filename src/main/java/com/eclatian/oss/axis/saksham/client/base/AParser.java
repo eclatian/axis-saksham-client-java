@@ -161,4 +161,6 @@ public abstract class AParser<K extends Request, V extends Response> {
      * @throws SakshamClientException If an exception occurs during the generation of JSON.
      */
     protected abstract String getJson(Object dataObject) throws SakshamClientException;
+    
+    protected abstract String getJsonValue(String json, String key) throws SakshamClientException;
 }
