@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
- */
 package com.eclatian.oss.axis.saksham.client.base;
 
 import java.util.LinkedHashMap;
@@ -9,8 +5,10 @@ import lombok.Getter;
 import lombok.Setter;
 
 /**
- * The {@code AParser} class is an abstract class that represents a parser for request and response objects.
- * It provides methods for generating encrypted and hybrid request JSON, retrieving response objects,
+ * The {@code AParser} class is an abstract class that represents a parser for request and response objects. Any
+ * parser implementation like Jackson or Gson needs to implement this and provide a relevant method 
+ * implementation so that in case of change of parser rest of the code remains unchanged. It provides methods 
+ * for generating encrypted and hybrid request JSON, retrieving response objects,
  * converting request objects to a map, and generating JSON from data objects.
  * This class serves as a base class for concrete parser implementations.
  *
@@ -162,5 +160,13 @@ public abstract class AParser<K extends Request, V extends Response> {
      */
     protected abstract String getJson(Object dataObject) throws SakshamClientException;
     
-    protected abstract String getJsonValue(String json, String key) throws SakshamClientException;
+    /**
+     * Retrieves value from a json by its key.
+     *
+     * @param json The json string from which value is to be fetched.
+     * @param key The key for which value is to be fetched.
+     * @return The generated JSON as a string.
+     * @throws SakshamClientException If an exception occurs during the generation of JSON.
+     */
+    public abstract String getJsonValue(String json, String key) throws SakshamClientException;
 }

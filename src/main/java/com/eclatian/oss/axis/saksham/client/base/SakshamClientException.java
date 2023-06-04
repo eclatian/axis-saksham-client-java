@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.eclatian.oss.axis.saksham.client.base;
 
 /**
@@ -11,8 +7,10 @@ package com.eclatian.oss.axis.saksham.client.base;
  * <p>The class extends the {@code Exception} class and provides three constructors for creating exceptions:</p>
  * <ul>
  *   <li>{@link #SakshamClientException()}: Creates a new instance of the exception with no message or cause.</li>
- *   <li>{@link #SakshamClientException(String)}: Creates a new instance of the exception with the specified message.</li>
- *   <li>{@link #SakshamClientException(String, Throwable)}: Creates a new instance of the exception with the specified
+ *   <li>{@link #SakshamClientException(String)}: Creates a new instance of the exception with the 
+ * specified message.</li>
+ *   <li>{@link #SakshamClientException(String, Throwable)}: Creates a new instance of the exception with 
+ * the specified
  *     message and cause.</li>
  * </ul>
  *

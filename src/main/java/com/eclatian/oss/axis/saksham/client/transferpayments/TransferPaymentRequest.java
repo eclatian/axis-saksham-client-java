@@ -9,6 +9,15 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+/**
+ * Represents a transfer payment request.
+ * This class extends the base Request class.
+ * It contains a list of payment details for the transfer.
+ *
+ * <p>
+ * @author Abhideep Chakravarty
+ * </p>
+ */
 @Getter
 @Setter
 @ToString
@@ -17,7 +26,12 @@ import lombok.ToString;
     body = "TransferPaymentRequestBody")
 public class TransferPaymentRequest extends Request {
 
-    @NotEmpty 
-   private ArrayList<@Valid PaymentDetail> paymentDetails;
+    /**
+     * The list of payment details for the transfer.
+     * The field is mandatory and cannot be empty.
+     */
+    @NotEmpty(message = "paymentDetails is mandatory")
+    private ArrayList<@Valid PaymentDetail> paymentDetails;
     
 }
+

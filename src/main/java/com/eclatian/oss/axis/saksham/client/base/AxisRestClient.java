@@ -1,13 +1,6 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package com.eclatian.oss.axis.saksham.client.base;
 
-/**
- *
- * @author Abhideep
- */
 import com.eclatian.oss.axis.saksham.client.SakshamManager;
 import java.io.IOException;
 import java.security.KeyManagementException;
@@ -53,7 +46,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 1.0
  * @author Abhideep Chakravarty
- */
+ */ 
 public enum AxisRestClient {
 
     /**
@@ -68,8 +61,9 @@ public enum AxisRestClient {
      * Retrieves the CloseableHttpClient instance for HTTP requests.
      *
      * @return The CloseableHttpClient instance.
+     * @throws com.eclatian.oss.axis.saksham.client.base.SakshamClientException
      */
-    public CloseableHttpClient getHttpClient() {
+    public CloseableHttpClient getHttpClient() throws SakshamClientException {
         if (this.httpClient == null) {
 
             try {
@@ -95,7 +89,7 @@ public enum AxisRestClient {
                         .build();
             } catch (NoSuchAlgorithmException | KeyStoreException | UnrecoverableKeyException | IOException
                     | CertificateException | KeyManagementException ex) {
-                logger.error("Could not initialize the HTTP client.", ex);
+                throw new SakshamClientException("Could not initialize the HTTP client.", ex);
             }
         }
         return this.httpClient;

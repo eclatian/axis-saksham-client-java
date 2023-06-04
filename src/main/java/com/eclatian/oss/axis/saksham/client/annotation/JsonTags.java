@@ -11,7 +11,8 @@ import java.lang.annotation.Target;
 
 
 /**
- * The {@code JsonTags} annotation is used to annotate a class with JSON tags information.
+ * The {@code JsonTags} annotation is used to annotate a subclass of {@link Request} or {@link Response} class
+ * with JSON tags information.
  * It is a custom annotation that can be applied to classes.
  *
  * <p>The {@code JsonTags} annotation is used at runtime and can be accessed via reflection.
@@ -26,7 +27,7 @@ import java.lang.annotation.Target;
  * }
  * }</pre>
  *
- * <p><strong>Author:</strong> Abhideep Chakravarty</p>
+ * @author: Abhideep Chakravarty
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

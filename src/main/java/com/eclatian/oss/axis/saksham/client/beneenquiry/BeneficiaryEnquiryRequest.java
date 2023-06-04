@@ -36,7 +36,7 @@ import lombok.ToString;
  * System.out.println(request.toString());
  * }</pre>
  *
- * <p><strong>Author:</strong> Abhideep Chakravarty</p>
+ * @author: Abhideep Chakravarty
  */
 @Getter
 @Setter

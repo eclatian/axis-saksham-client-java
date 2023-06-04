@@ -2,100 +2,148 @@ package com.eclatian.oss.axis.saksham.client.base;
 
 import com.eclatian.oss.axis.saksham.client.SakshamManager;
 import com.eclatian.oss.axis.saksham.client.annotation.AxisAPI;
+import com.eclatian.oss.axis.saksham.client.base.restclient.HttpClientRestImpl;
+import com.eclatian.oss.axis.saksham.client.base.restclient.IRestClient;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
-import java.io.IOException;
 import java.lang.reflect.ParameterizedType;
 import java.util.Set;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.ParseException;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.util.EntityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The {@code BaseService} class is an abstract class that provides common functionality for service classes handling
- * Axis requests.
+ * The abstract base class for Axis service implementations.
  *
  * <p>
- * The class declares the following fields:</p>
- * <ul>
- * <li>{@code logger}: The logger instance for logging purposes.</li>
- * <li>{@code parser}: The AParser instance for JSON parsing.</li>
- * </ul>
+ * This class provides common functionality for triggering Axis requests and handling the responses. It defines a
+ * generic type {@code K} for the request and {@code V} for the response, which are subclasses of {@link Request} and
+ * {@link Response} respectively.
+ * </p>
  *
  * <p>
- * The class provides the following methods:</p>
- * <ul>
- * <li>{@link #trigger(Request)}: Triggers the Axis request and returns the response.
- * <ul>
- * <li>Description: Validates the request, converts it to JSON format based on the options, and makes the API request.
- * It returns the parsed response or logs an error if an exception occurs.</li>
- * <li>Parameters:
- * <ul>
- * <li>{@code request}: The Axis request to be triggered.</li>
- * </ul>
- * </li>
- * <li>Returns: The Axis response object.</li>
- * </ul>
- * </li>
- * </ul>
+ * The {@code BaseService} class is designed to be extended by specific service implementations. It contains a logger
+ * for logging purposes and an instance of {@link IRestClient} for making API requests.
+ * </p>
  *
  * <p>
- * The class also includes private helper methods for request validation, making the API request, retrieving the API
- * path, and parsing the response object.</p>
+ * The {@code trigger} method is the entry point for triggering an Axis request and obtaining the response. It takes a
+ * request object of type {@code K}, validates the request using Java Bean Validation API, converts the request to JSON
+ * using the {@link IRestClient#getJsonRequest} method, and makes the API request using the
+ * {@link IRestClient#makeAPIRequest} method. The resulting response object of type {@code V} is returned.
+ * </p>
  *
  * <p>
- * Note: This is an abstract class, and concrete service classes should extend it and implement the necessary abstract
- * methods.</p>
+ * The {@code validateRequest} method performs the validation of the request object using the Java Bean Validation API.
+ * It obtains the default validator factory and validator, and validates the request against the defined constraints. If
+ * there are any constraint violations, a {@link SakshamClientException} is thrown with the violation details.
+ * </p>
  *
- * @param <K> The type parameter representing the Axis request.
- * @param <V> The type parameter representing the Axis response.
- *
+ * @param <K> The type of the request object, which must be a subclass of {@link Request}.
+ * @param <V> The type of the response object, which must be a subclass of {@link Response}.
  * @see Request
  * @see Response
- * @see AParser
- * @see Logger
- *
- * @since 1.0
+ * @see IRestClient
+ * @see SakshamClientException
+ * @see Validation
+ * @see Validator
+ * @see ConstraintViolation
  * @author Abhideep Chakravarty
  */
 public abstract class BaseService<K extends Request, V extends Response> {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
-    private final AParser parser = new JacksonParser();
+    private final IRestClient restClient = new HttpClientRestImpl();
+    protected AParser parser = new JacksonParser();
+    
+    
 
     /**
      * Triggers the Axis request and returns the response.
      *
      * @param request The Axis request to be triggered.
      * @return The Axis response object.
+     * @throws SakshamClientException If an error occurs during the request triggering process.
      */
-    public V trigger(K request) {
+    public V trigger(K request) throws SakshamClientException {
         V response = null;
         try {
             this.validateRequest(request);
-            String requestJson;
-            logger.debug("Mode : " + SakshamManager.INSTANCE.getOptions().isHideRequestRawJson());
-            if (SakshamManager.INSTANCE.getOptions().isHideRequestRawJson()) {
-                requestJson = this.parser.getEncryptedRequestJson(request);
-            } else {
-                requestJson = this.parser.getHybridRequestJson(request);
-            }
-            response = this.makeAPIRequest(requestJson);
+            String requestJson = this.restClient.getJsonRequest(request);
+            String url = SakshamManager.INSTANCE.getOptions().getEnv().getApiRootURL() + this.getAPIPath();
+            logger.debug("Target URL = " + url);
+            String responseString = this.restClient.makeAPIRequest(url, requestJson);
+            response = this.parseObject(responseString);
         } catch (SakshamClientException ex) {
             logger.error("An error occurred: {}", ex.getMessage(), ex);
         }
         return response;
     }
+    
+    /**
+     * Parses the response JSON and returns the corresponding response object.
+     *
+     * <p>
+     * The method uses the configured {@link AParser} implementation to parse the response JSON
+     * and converts it to the appropriate response object type.
+     * </p>
+     *
+     * @param responseJson The response JSON string.
+     * @return The parsed response object.
+     * @throws SakshamClientException If an error occurs during parsing or if the response contains an 
+     * error message.
+     */
+    protected V parseObject(String responseJson) throws SakshamClientException {
+        V response = null;
+        try {
+            response = (V) parser.getResponseObject(responseJson, getResponseType());
+        } catch (SakshamClientException ex) {
+            throw new SakshamClientException("Could not parse the response JSON.", ex);
+        }
+        if (response.getErrorMessage() != null) {
+            throw new SakshamClientException(response.getErrorMessage());
+        }
+        return response;
+    }
+    
+    
 
+    /**
+     * Retrieves the response type of the service.
+     *
+     * @return The response type class.
+     */
+    protected Class<V> getResponseType() {
+        return (Class<V>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[1];
+    }
+
+    
+
+    /**
+     * Retrieves the API path for the REST client.
+     *
+     * @return The API path as specified by the {@link AxisAPI} annotation.
+     */
+    protected String getAPIPath() {
+        AxisAPI annotation = this.getClass().getAnnotation(AxisAPI.class);
+        String apiPath = annotation.path();
+        logger.debug("API Path for " + this.getClass().getTypeName() + " is " + apiPath);
+        return apiPath;
+    }
+
+    /**
+     * Validates the given request object using Java Bean Validation API.
+     *
+     * <p>
+     * This method performs validation of the request object against the defined constraints. It uses the default
+     * validator factory and validator obtained from the Validation API. If there are any constraint violations, a
+     * {@link SakshamClientException} is thrown with the violation details.
+     * </p>
+     *
+     * @param request The request object to be validated.
+     * @throws SakshamClientException If the request fails validation due to constraint violations.
+     */
     private void validateRequest(K request) throws SakshamClientException {
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         Validator validator = factory.getValidator();
@@ -111,98 +159,5 @@ public abstract class BaseService<K extends Request, V extends Response> {
             throw new SakshamClientException(message.toString());
         }
         logger.debug("Validation check done.");
-    }
-
-    private V makeAPIRequest(String requestJson) throws SakshamClientException {
-        CloseableHttpClient client = AxisRestClient.INSTANCE.getHttpClient();
-        String url = SakshamManager.INSTANCE.getOptions().getEnv().getApiRootURL() + this.getAPIPath();
-        logger.debug("Target URL = " + url);
-
-        // Create and send a request
-        HttpPost httpPost = new HttpPost(url);
-        httpPost.setHeader("Content-Type", "application/json");
-        logger.debug("Client id = " + SakshamManager.INSTANCE.getOptions().getClientId());
-        logger.debug("Client secret = " + SakshamManager.INSTANCE.getOptions().getClientSecret());
-        httpPost.setHeader("X-IBM-Client-Id", SakshamManager.INSTANCE.getOptions().getClientId());
-        httpPost.setHeader("X-IBM-Client-Secret", SakshamManager.INSTANCE.getOptions()
-            .getClientSecret());
-        httpPost.setEntity(new StringEntity(requestJson, ContentType.APPLICATION_JSON));
-        logger.debug("Request URL = " + httpPost.toString());
-        HttpResponse response = null;
-        try {
-            response = client.execute(httpPost);
-        } catch (IOException ex) {
-            throw new SakshamClientException("Could not make a successful API call. Verify your IP"
-                + " address is whitelisted and you are using mTLS properly.", ex);
-        }
-        logger.debug("Status code = " + response.getStatusLine().getStatusCode());
-        this.validateResponse(response);
-        String responseString = this.convertHttpResponseToString(response);
-        logger.debug("Valid reponse String : " + responseString);
-
-        return parseObject(responseString);
-    }
-
-    private String convertHttpResponseToString(HttpResponse response) throws SakshamClientException {
-        HttpEntity entity2 = response.getEntity();
-        String responseString;
-        try {
-            responseString = EntityUtils.toString(entity2, "UTF-8");
-        } catch (IOException | ParseException ex) {
-            throw new SakshamClientException("Could not convert the API response to String.", ex);
-        }
-        return responseString;
-    }
-
-    private String getAPIPath() {
-        AxisAPI annotation = this.getClass().getAnnotation(AxisAPI.class);
-        String apiPath = annotation.path();
-        logger.debug("API Path for " + this.getClass().getTypeName() + " is " + apiPath);
-        return apiPath;
-    }
-
-    private V parseObject(String responseJson) throws SakshamClientException {
-        V response = null;
-        try {
-            response = (V) parser.getResponseObject(responseJson, getReponseType());
-        } catch (SakshamClientException ex) {
-            throw new SakshamClientException("Could not parse the response JSON.", ex);
-        }
-        if (response.getErrorMessage() != null) {
-            throw new SakshamClientException(response.getErrorMessage());
-        }
-        return response;
-    }
-
-    /**
-     * Retrieves the response type of the service.
-     *
-     * @return The response type class.
-     */
-    private Class<V> getReponseType() {
-        return (Class<V>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[1];
-    }
-
-    private void validateResponse(HttpResponse httpResponse) throws SakshamClientException {
-        switch (httpResponse.getStatusLine().getStatusCode()) {
-            case 200:
-                return;
-            case 503:
-                this.convert503ToException(httpResponse);
-                break;
-
-        }
-    }
-
-    private void convert503ToException(HttpResponse httpResponse) throws SakshamClientException {
-        String responseString = this.convertHttpResponseToString(httpResponse);
-        logger.debug("Error 503 reponse String : " + responseString);
-        String sb = "httpCode: CODE | httpMessage: MSG | errorCode: ERR "
-            + "| moreInformation: INFO";
-        sb = sb.replace("CODE", parser.getJsonValue(responseString, "httpCode"))
-            .replace("MSG", parser.getJsonValue(responseString, "httpMessage"))
-            .replace("ERR", parser.getJsonValue(responseString, "errorCode"))
-            .replace("INFO", parser.getJsonValue(responseString, "moreInformation"));
-        throw new SakshamClientException(sb);
     }
 }

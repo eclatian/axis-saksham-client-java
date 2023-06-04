@@ -29,7 +29,7 @@ public class GetStatusServiceTest {
     public void testTrigger() throws SakshamClientException {
         // Create a mock request
         GetStatusRequest bs2 = new GetStatusRequest();
-        bs2.setCrn("akjsdh");
+        bs2.setCrn("ABCDREF");
         
         
 

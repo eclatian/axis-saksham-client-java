@@ -1,14 +1,13 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.eclatian.oss.axis.saksham.client.transferpayments;
 
 import lombok.Getter;
 
 /**
+ * Represents the transaction payment mode.
  *
- * @author Abhideep
+ * <p>
+ * <b>Author:</b> Abhideep Chakravarty
+ * </p>
  */
 @Getter
 public enum TxnPayMode {
@@ -19,12 +18,17 @@ public enum TxnPayMode {
     FT("Fund Transfer (Axis to Axis)"),
     CC("Corporate Cheques"),
     DD("Demand Draft");
-    
+
     private String hint;
 
+    /**
+     * Constructs a new transaction payment mode with the specified hint.
+     *
+     * @param pHint the hint for the payment mode
+     */
     private TxnPayMode(String pHint) {
         this.hint = pHint;
     }
     
-    
 }
+

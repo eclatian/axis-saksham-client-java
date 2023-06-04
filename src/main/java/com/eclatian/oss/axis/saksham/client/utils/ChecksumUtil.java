@@ -7,6 +7,7 @@ package com.eclatian.oss.axis.saksham.client.utils;
 import com.eclatian.oss.axis.saksham.client.base.AParser;
 import com.eclatian.oss.axis.saksham.client.base.JacksonParser;
 import com.eclatian.oss.axis.saksham.client.base.Request;
+import com.eclatian.oss.axis.saksham.client.base.SakshamClientException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -111,7 +112,8 @@ public class ChecksumUtil {
                 }
             }
         } catch (Exception e) {
-            //logger.error(e);
+           throw new SakshamClientException("Could not generate checksum value for the given object.",
+               e);
         }
         logger.debug("Checksum = " + finalChkSum.toString().trim());
         return String.valueOf(

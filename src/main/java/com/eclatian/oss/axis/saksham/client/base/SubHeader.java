@@ -20,7 +20,7 @@ import lombok.Setter;
  * subHeader.setChannelId("web");
  * }</pre>
  *
- * <p><strong>Author:</strong> Abhideep Chakravarty</p>
+ * @author: Abhideep Chakravarty
  */
 @Getter
 @Setter

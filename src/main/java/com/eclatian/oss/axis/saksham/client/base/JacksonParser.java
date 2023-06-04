@@ -23,53 +23,124 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The {@code JacksonParser} class is a subclass of {@code AParser} that provides JSON parsing
- * functionality using the Jackson library.
+ * The Jackson parser implementation for converting Axis request and response objects to JSON and vice versa.
  *
- * <p>The class declares the following fields:</p>
- * <ul>
- *   <li>{@code logger}: The logger instance for logging purposes.</li>
- *   <li>{@code objectMapper}: The ObjectMapper instance for JSON parsing.</li>
- * </ul>
+ * <p>
+ * The {@code JacksonParser} class is responsible for serializing Axis request and response objects to JSON using the
+ * Jackson library. It also provides methods for parsing JSON strings to objects and extracting specific values from
+ * JSON.
+ * </p>
  *
- * <p>The class overrides the following methods:</p>
- * <ul>
- *   <li>{@link #getEncryptedRequestJson(Request)}: Generates the JSON for an encrypted request.</li>
- *   <li>{@link #getHybridRequestJson(Request)}: Generates the JSON for a hybrid request.</li>
- *   <li>{@link #getJson(Object)}: Converts an object to its JSON representation.</li>
- *   <li>{@link #getResponseObject(String, Class)}: Converts the JSON response to the specified response object.</li>
- * </ul>
+ * <p>
+ * The parser uses an instance of {@link ObjectMapper} from Jackson to perform the serialization and deserialization. It
+ * also configures the coercion of empty strings to empty values for certain data types using the
+ * {@link ObjectMapper#coercionConfigFor} method.
+ * </p>
  *
- * <p>The class also includes private helper methods for generating sub-header JSON, auto-populating sub-header,
- * getting decrypted JSON string, and getting data JSON string.</p>
+ * <p>
+ * The {@code getEncryptedRequestJson} method converts a request object to a JSON string for an encrypted request. It
+ * builds a JSON template with placeholders for the root tag, subheader, encrypted tag, and encrypted data. It replaces
+ * the placeholders with the actual values from the request object and calls the necessary utility methods to set the
+ * checksum and encrypt the body. The final JSON string is returned.
+ * </p>
  *
- * @see AParser
- * @see Request
- * @see Response
- * @see Logger
+ * <p>
+ * The {@code getSubHeaderJson} method retrieves the subheader JSON from the request object. If the
+ * autoPopulateSubHeader flag is enabled in the {@link SakshamManager} options, it automatically populates the subheader
+ * fields. Otherwise, it retrieves the subheader from the request object. The subheader is then converted to JSON using
+ * the {@code getJson} method.
+ * </p>
+ *
+ * <p>
+ * The {@code autoPopulateSubHeader} method is used to automatically populate the subheader fields when the
+ * {@code autoPopulateSubHeader} flag is enabled. It creates a new {@link SubHeader} object, sets the required fields
+ * like serviceRequestId, serviceRequestVersion, channelId, and requestUUID, and returns the populated subheader.
+ * </p>
+ *
+ * <p>
+ * The {@code getHybridRequestJson} method converts a request object to a JSON string for a hybrid request. Similar to
+ * {@code getEncryptedRequestJson}, it builds a JSON template with placeholders and replaces them with actual values. It
+ * also converts the request body to JSON using the {@code getJson} method. The final JSON string is returned.
+ * </p>
+ *
+ * <p>
+ * The {@code getJson} method converts an object to JSON using the {@link ObjectMapper#writeValueAsString} method. If
+ * any exception occurs during the serialization process, a {@link SakshamClientException} is thrown.
+ * </p>
+ *
+ * <p>
+ * The {@code getResponseObject} method parses a JSON string to a response object. It extracts the encrypted JSON data
+ * from the response, decrypts it, and retrieves the actual data JSON using the provided root tag and body tag. The
+ * decrypted data is then deserialized to the response object using the {@link ObjectMapper#readValue} method.
+ * </p>
+ *
+ * <p>
+ * The {@code getDecryptedJsonString} method reads the encrypted JSON data from the response JSON, decrypts it using
+ * AES-128 decryption, and returns the decrypted JSON string.
+ * </p>
+ *
+ * <p>
+ * The {@code getDataJsonString} method reads the decrypted JSON string, extracts the status field, and checks if it is
+ * "F" indicating an error. If an error occurs, a {@link SakshamClientException} is thrown with the error message.
+ * Otherwise, it retrieves the data JSON using the provided body tag and returns it.
+ * </p>
+ *
+ * <p>
+ * The {@code getMap} method converts an object to a {@link LinkedHashMap} using the {@link ObjectMapper#convertValue}
+ * method. This method is used to convert a request object to a map for generating the checksum.
+ * </p>
+ *
+ * <p>
+ * The {@code getJsonValue} method retrieves a specific value from a JSON string based on the provided key. It reads the
+ * JSON string as a string key-value pair map and returns the value corresponding to the given key.
+ * </p>
+ *
+ * <p>
+ * Note: The {@code JacksonParser} class assumes the presence of the {@link Logger} and {@link LoggerFactory} classes
+ * for logging purposes.
+ * </p>
+ *
  * @see ObjectMapper
- *
- * @since 1.0
- * @author Abhideep Chakravarty
+ * @see SakshamClientException
+ * @see Logger
+ * @see LoggerFactory
  */
 public class JacksonParser extends AParser {
 
+    /**
+     * The logger instance for logging messages.
+     */
     protected final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
-    private final ObjectMapper objectMapper = new ObjectMapper();
-
-    public JacksonParser() {
-        objectMapper.coercionConfigFor(LogicalType.POJO).setCoercion(CoercionInputShape
-            .EmptyString, CoercionAction.AsEmpty);
-    }
-    
-    
 
     /**
-     * Generates the JSON for an encrypted request.
+     * The ObjectMapper instance for serializing and deserializing objects.
+     */
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    /**
+     * Constructs a new JacksonParser and configures the coercion of empty strings to empty values for
+     * certain data
+     * types.
+     */
+    public JacksonParser() {
+        objectMapper.coercionConfigFor(LogicalType.POJO)
+            .setCoercion(CoercionInputShape.EmptyString, CoercionAction.AsEmpty);
+    }
+
+    /**
+     * Converts a request object to an encrypted JSON request string.
      *
-     * @param request The request object.
-     * @return The JSON representation of the encrypted request.
-     * @throws SakshamClientException if an error occurs while generating the JSON.
+     * <p>
+     * The method builds a JSON template with placeholders for the root tag, subheader, encrypted tag, 
+     * and encrypted
+     * data. It replaces the placeholders with the actual values from the request object and calls the necessary
+     * utility
+     * methods to set the checksum and encrypt the body. The final JSON string is returned.
+     * </p>
+     *
+     * @param request The Axis request object.
+     * @return The encrypted JSON request string.
+     * @throws SakshamClientException If an error occurs during the conversion.
      */
     @Override
     public String getEncryptedRequestJson(Request request) throws SakshamClientException {
@@ -77,27 +148,40 @@ public class JacksonParser extends AParser {
             + "\"ROOT_TAG\": {"
             + "\"SubHeader\": SUB_HEADER_DATA,"
             + "\"ENC_TAG\": \"ENC_DATA\""
-            + ""
             + "}"
             + "}";
-        logger.debug("Json : " + json);
+        logger.debug("Json: " + json);
         try {
             ChecksumUtil.setChecksum(request);
         } catch (Exception ex) {
             java.util.logging.Logger.getLogger(BaseService.class.getName()).log(Level.SEVERE, null, ex);
         }
         String encData = EncryptionUtil.getEncryptedBody(request);
-        logger.debug("ENC : " + encData);
+        logger.debug("ENC: " + encData);
         String subHeaderJson = this.getSubHeaderJson(request);
         JsonTagsData td = TagsUtil.getTags(request.getClass());
-        json = json.replace("ROOT_TAG", td.getRootTag()).replace("ENC_TAG",
-            td.getEncTag()).replace("ENC_DATA", encData)
+        json = json.replace("ROOT_TAG", td.getRootTag())
+            .replace("ENC_TAG", td.getEncTag())
+            .replace("ENC_DATA", encData)
             .replace("SUB_HEADER_DATA", subHeaderJson);
-        logger.debug("FInal json : " + json);
+        logger.debug("Final JSON: " + json);
         return json;
     }
 
-    private String getSubHeaderJson(Request request) {
+    /**
+     * Retrieves the subheader JSON from the request object.
+     *
+     * <p>
+     * If the autoPopulateSubHeader flag is enabled in the {@link SakshamManager} options, it automatically populates
+     * the subheader fields. Otherwise, it retrieves the subheader from the request object. The subheader is then
+     * converted to JSON using the {@code getJson} method.
+     * </p>
+     *
+     * @param request The Axis request object.
+     * @return The subheader JSON string.
+     * @throws SakshamClientException If an error occurs during the conversion.
+     */
+    private String getSubHeaderJson(Request request) throws SakshamClientException {
         String json = null;
         SubHeader subHeader;
         if (SakshamManager.INSTANCE.getOptions().isAutoPopulateSubHeader()) {
@@ -108,11 +192,22 @@ public class JacksonParser extends AParser {
         try {
             json = this.getJson(subHeader);
         } catch (SakshamClientException ex) {
-            logger.error(ex.getMessage());
+            throw new SakshamClientException("Could not created SubHeader json.",ex);
         }
         return json;
     }
 
+    /**
+     * Automatically populates the subheader fields.
+     *
+     * <p>
+     * When the autoPopulateSubHeader flag is enabled, this method creates a new {@link SubHeader} object and sets the
+     * required fields such as serviceRequestId, serviceRequestVersion, channelId, and requestUUID. It returns the
+     * populated subheader.
+     * </p>
+     *
+     * @return The populated subheader object.
+     */
     private SubHeader autoPopulateSubHeader() {
         SubHeader sub = new SubHeader();
         sub.setServiceRequestId("OpenAPI");
@@ -125,13 +220,18 @@ public class JacksonParser extends AParser {
     }
 
     /**
-     * Generates the JSON for a hybrid request.
+     * Converts a request object to a hybrid JSON request string.
      *
-     * @param request The request object.
-     * @return The JSON representation of the hybrid request.
-     * @throws SakshamClientException if an error occurs while generating the JSON.
+     * <p>
+     * The method builds a JSON template with placeholders for the root tag, subheader, body tag, and encrypted tag. It
+     * replaces the placeholders with the actual values from the request object and calls the necessary utility methods
+     * to set the checksum, convert the body to JSON, and encrypt the body. The final JSON string is returned.
+     * </p>
+     *
+     * @param request The Axis request object.
+     * @return The hybrid JSON request string.
+     * @throws SakshamClientException If an error occurs during the conversion.
      */
-    
     @Override
     public String getHybridRequestJson(Request request) throws SakshamClientException {
         String json = "{"
@@ -139,62 +239,72 @@ public class JacksonParser extends AParser {
             + "\"SubHeader\": SUB_HEADER_DATA,"
             + "\"BODY_TAG\": BODY_DATA,"
             + "\"ENC_TAG\": \"ENC_DATA\""
-            + ""
             + "}"
             + "}";
-        logger.debug("Json : " + json);
+        logger.debug("Json: " + json);
         try {
             ChecksumUtil.setChecksum(request);
         } catch (Exception ex) {
-            java.util.logging.Logger.getLogger(BaseService.class.getName()).log(Level.SEVERE, null, ex);
+            throw new SakshamClientException("Could not set proper checksum.", ex);
         }
         String reqBodyJson = null;
         try {
             reqBodyJson = this.getJson(request);
         } catch (SakshamClientException ex) {
-            throw new SakshamClientException("Could not parse the object to JSON for unencrypted"
-                + " request body.", ex);
+            throw new SakshamClientException("Could not parse the object to JSON for unencrypted "
+                + "request body.", ex);
         }
         String subHeaderJson = this.getSubHeaderJson(request);
         JsonTagsData td = TagsUtil.getTags(request.getClass());
         String encData = EncryptionUtil.getEncryptedBody(request);
-        json = json.replace("ROOT_TAG", td.getRootTag()).replace("BODY_TAG",
-            td.getBodyTag()).replace("BODY_DATA", reqBodyJson)
-            .replace("SUB_HEADER_DATA", subHeaderJson).replace("ENC_TAG",
-            td.getEncTag()).replace("ENC_DATA", encData);
-        logger.debug("FInal json : " + json);
+        json = json.replace("ROOT_TAG", td.getRootTag())
+            .replace("BODY_TAG", td.getBodyTag())
+            .replace("BODY_DATA", reqBodyJson)
+            .replace("SUB_HEADER_DATA", subHeaderJson)
+            .replace("ENC_TAG", td.getEncTag())
+            .replace("ENC_DATA", encData);
+        logger.debug("Final JSON: " + json);
         return json;
     }
 
     /**
-     * Converts an object to its JSON representation.
+     * Converts an object to a JSON string using the Jackson ObjectMapper.
      *
-     * @param dataObject The object to be converted.
-     * @return The JSON representation of the object.
-     * @throws SakshamClientException if an error occurs while converting the object to JSON.
+     * <p>
+     * The method uses the {@link ObjectMapper#writeValueAsString} method to serialize the object to JSON. If any
+     * exception occurs during the serialization process, a {@link SakshamClientException} is thrown.
+     * </p>
+     *
+     * @param dataObject The object to be converted to JSON.
+     * @return The JSON string representation of the object.
+     * @throws SakshamClientException If an error occurs during the serialization process.
      */
     @Override
     protected String getJson(Object dataObject) throws SakshamClientException {
         try {
             return objectMapper.writeValueAsString(dataObject);
         } catch (JsonProcessingException ex) {
-            throw new SakshamClientException("Could not convert " + dataObject.getClass() + " object to json.",
+            throw new SakshamClientException("Could not convert " + dataObject.getClass() + " object to JSON.",
                 ex);
         }
-
     }
 
     /**
-     * Converts the JSON response to the specified response object.
+     * Parses a JSON string to a response object.
      *
-     * @param json The JSON response.
-     * @param type The response type class.
-     * @return The response object.
-     * @throws SakshamClientException if an error occurs while converting the JSON to the response object.
+     * <p>
+     * The method takes a JSON string, extracts the encrypted JSON data from it, decrypts the data, retrieves the actual
+     * data JSON using the provided root tag and body tag, and deserializes the data to the response object using the
+     * {@link ObjectMapper#readValue} method.
+     * </p>
+     *
+     * @param json The JSON string to be parsed.
+     * @param type The class of the response object.
+     * @return The parsed response object.
+     * @throws SakshamClientException If an error occurs during the parsing process.
      */
     @Override
     public Response getResponseObject(String json, Class type) throws SakshamClientException {
-        
         JsonTagsData td = TagsUtil.getTags(type);
         String decryptedJson = getDecryptedJsonString(json, type, td);
         String dataJson = getDataJsonString(decryptedJson, type, td);
@@ -202,68 +312,135 @@ public class JacksonParser extends AParser {
         try {
             res = (Response) objectMapper.readValue(dataJson, type);
         } catch (JsonProcessingException ex) {
-            throw new SakshamClientException("Could not convert the decrypted json to " + type.getName() 
+            throw new SakshamClientException("Could not convert the decrypted JSON to " + type.getName() 
                 + " object.", ex);
         }
-        logger.debug("Response object = " + res.toString());
+        logger.debug("Response object: " + res.toString());
         return res;
     }
 
-    private String getDecryptedJsonString(String json, Class type, JsonTagsData td) 
+    /**
+     * Reads the encrypted JSON data from the response JSON and decrypts it.
+     *
+     * <p>
+     * The method reads the encrypted JSON data from the response JSON, decrypts it using AES-128 decryption, and
+     * returns the decrypted JSON string.
+     * </p>
+     *
+     * @param json The response JSON string.
+     * @param type The class of the response object.
+     * @param td The JSON tags data containing the root tag and encrypted tag.
+     * @return The decrypted JSON string.
+     * @throws SakshamClientException If an error occurs during the decryption process.
+     */
+    private String getDecryptedJsonString(String json, Class<?> type, JsonTagsData td)
         throws SakshamClientException {
         JsonNode jsonNode;
         try {
             jsonNode = objectMapper.readTree(json);
         } catch (JsonProcessingException ex) {
-            throw new SakshamClientException("Could not read response josn of type  " + type ,ex);
-        }            
+            throw new SakshamClientException("Could not read response JSON of type " + type, ex);
+        }
         String encResponseData = jsonNode.get(td.getRootTag()).get(td.getEncTag()).asText();
         String decryptedJson;
         try {
             decryptedJson = EncryptionUtil.aes128Decrypt(encResponseData);
         } catch (Exception ex) {
-            throw new SakshamClientException("Could not decrypt the json data for  " + td.getEncTag() ,ex);
+            throw new SakshamClientException("Could not decrypt the JSON data for " + td.getEncTag(), ex);
         }
-        logger.debug("Decrypted json = " + decryptedJson);
+        logger.debug("Decrypted JSON: " + decryptedJson);
         return decryptedJson;
     }
-    
-    
-    private String getDataJsonString(String json, Class type, JsonTagsData td) 
+
+    /**
+     * Retrieves the data JSON from the decrypted JSON string.
+     *
+     * <p>
+     * The method reads the decrypted JSON string, extracts the status field, and checks if it is "F", 
+     * indicating an
+     * error. If an error occurs, a {@link SakshamClientException} is thrown with the error message.
+     * Otherwise, it
+     * retrieves the data JSON using the provided body tag and returns it.
+     * </p>
+     *
+     * @param json The decrypted JSON string.
+     * @param type The class of the response object.
+     * @param td The JSON tags data containing the root tag and body tag.
+     * @return The data JSON string.
+     * @throws SakshamClientException If an error occurs during the retrieval process.
+     */
+    private String getDataJsonString(String json, Class<?> type, JsonTagsData td)
         throws SakshamClientException {
-        JsonNode jsonNode = readJsonKey(json, type);   
+        JsonNode jsonNode = readJsonKey(json, type);
         String status = jsonNode.get("status").asText();
         if ("F".equals(status)) {
             String error = jsonNode.get("message").asText();
             throw new SakshamClientException(error);
         }
         String dataJson = jsonNode.get(td.getBodyTag()).toString();
-        
-        logger.debug("Data json = " + dataJson);
+
+        logger.debug("Data JSON: " + dataJson);
         return dataJson;
     }
 
-    private JsonNode readJsonKey(String json, Class type) throws SakshamClientException {
+    /**
+     * Reads a JSON key from the JSON string.
+     *
+     * <p>
+     * The method reads the JSON string as a string key-value pair map using the 
+     * {@link ObjectMapper#readTree} method
+     * and returns the corresponding JSON node based on the provided key.
+     * </p>
+     *
+     * @param json The JSON string.
+     * @param type The class of the response object.
+     * @return The JSON node corresponding to the provided key.
+     * @throws SakshamClientException If an error occurs during the JSON reading process.
+     */
+    private JsonNode readJsonKey(String json, Class<?> type) throws SakshamClientException {
         JsonNode jsonNode;
         try {
             jsonNode = objectMapper.readTree(json);
         } catch (JsonProcessingException ex) {
-            throw new SakshamClientException("Could not read data josn for type  " + type ,ex);
+            throw new SakshamClientException("Could not read data JSON for type " + type, ex);
         }
         return jsonNode;
     }
-    
+
+    /**
+     * Converts an object to a {@link LinkedHashMap} representation.
+     *
+     * <p>
+     * The method uses the {@link ObjectMapper#convertValue} method to convert the object to a
+     * {@link LinkedHashMap}
+     * representation.
+     * </p>
+     *
+     * @param request The object to be converted.
+     * @return The {@link LinkedHashMap} representation of the object.
+     */
     @Override
     public LinkedHashMap<String, Object> getMap(Object request) {
-        return objectMapper.convertValue(request,
-            new TypeReference<LinkedHashMap<String, Object>>() {
+        return objectMapper.convertValue(request, new TypeReference<LinkedHashMap<String, Object>>() {
         });
-
     }
 
+    /**
+     * Retrieves the value of a specific key from a JSON string.
+     *
+     * <p>
+     * The method reads the JSON string as a string key-value pair map using the {@link ObjectMapper#readTree} method
+     * and returns the value corresponding to the provided key.
+     * </p>
+     *
+     * @param json The JSON string.
+     * @param key The key to retrieve the value for.
+     * @return The value corresponding to the provided key.
+     * @throws SakshamClientException If an error occurs during the JSON reading process.
+     */
     @Override
-    protected String getJsonValue(String json, String key) throws SakshamClientException {
-        JsonNode jsonNode = readJsonKey(json, String.class);   
+    public String getJsonValue(String json, String key) throws SakshamClientException {
+        JsonNode jsonNode = readJsonKey(json, String.class);
         String value = jsonNode.get(key).asText();
         logger.debug("Key = {} Value = {}", key, value);
         return value;

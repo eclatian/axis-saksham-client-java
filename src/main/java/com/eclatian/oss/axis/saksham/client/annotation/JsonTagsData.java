@@ -9,7 +9,8 @@ import lombok.Setter;
 import lombok.ToString;
 
 /**
- * The {@code JsonTagsData} class represents the JSON tags data for a specific class.
+ * The {@code JsonTagsData} class represents the JSON tags data for a specific class which is annotated with
+ * {@link JsonTags}.
  * It is a simple data class that encapsulates the JSON tags information.
  *
  * <p>The {@code JsonTagsData} class provides getter and setter methods for the three JSON tags:
@@ -29,7 +30,7 @@ import lombok.ToString;
  * // Output: JsonTagsData(rootTag=data, bodyTag=body, encTag=encryptedData)
  * }</pre>
  *
- * <p><strong>Author:</strong> Abhideep Chakravarty</p>
+ * @author: Abhideep Chakravarty
  */
 @Getter
 @Setter

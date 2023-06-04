@@ -20,7 +20,7 @@ package com.eclatian.oss.axis.saksham.client.beneenquiry;
  * }
  * }</pre>
  *
- * <p><strong>Author:</strong> Abhideep Chakravarty</p>
+ * @author: Abhideep Chakravarty
  */
 public enum BeneStatus {
     /**

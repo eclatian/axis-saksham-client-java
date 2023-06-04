@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.eclatian.oss.axis.saksham.client.base;
 
 import com.eclatian.oss.axis.saksham.client.SakshamManager;
@@ -26,15 +22,19 @@ import lombok.Setter;
  *   <li>{@link #channelId}:
  *     <ul>
  *       <li>Description: A string representing the channel ID associated with the request.</li>
- *       <li>Importance of Annotation: The {@link NotNull} annotation is used to indicate that this attribute cannot have a {@code null} value.</li>
- *       <li>Default Value: The default value is retrieved from the {@code SakshamManager.INSTANCE.getOptions().getChannelId()} method call.</li>
+ *       <li>Importance of Annotation: The {@link NotNull} annotation is used to indicate that this 
+ * attribute cannot have a {@code null} value.</li>
+ *       <li>Default Value: The default value is retrieved from the {@code SakshamManager.INSTANCE.getOptions()
+ * .getChannelId()} method call.</li>
  *     </ul>
  *   </li>
  *   <li>{@link #corpCode}:
  *     <ul>
  *       <li>Description: A string representing the corporate code associated with the request.</li>
- *       <li>Importance of Annotation: The {@link NotNull} annotation is used to indicate that this attribute cannot have a {@code null} value.</li>
- *       <li>Default Value: The default value is retrieved from the {@code SakshamManager.INSTANCE.getOptions().getCorpCode()} method call.</li>
+ *       <li>Importance of Annotation: The {@link NotNull} annotation is used to indicate that this 
+ * attribute cannot have a {@code null} value.</li>
+ *       <li>Default Value: The default value is retrieved from the {@code SakshamManager.INSTANCE.getOptions()
+ * .getCorpCode()} method call.</li>
  *     </ul>
  *   </li>
  *   <li>{@link #checksum}:
@@ -44,8 +44,12 @@ import lombok.Setter;
  *   </li>
  *   <li>{@link #subHeader}:
  *     <ul>
- *       <li>Description: An instance of the {@link SubHeader} class representing the subheader associated with the request.</li>
- *       <li>Importance of Annotation: The {@link JsonIgnore} annotation is used to indicate that this attribute should be ignored during JSON serialization and deserialization.</li>
+ *       <li>Description: An instance of the {@link SubHeader} class representing the subheader associated
+ * 
+ * 
+ * with the request.</li>
+ *       <li>Importance of Annotation: The {@link JsonIgnore} annotation is used to indicate that this 
+ * attribute should be ignored during JSON serialization and deserialization.</li>
  *     </ul>
  *   </li>
  * </ul>

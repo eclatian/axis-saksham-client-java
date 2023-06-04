@@ -6,12 +6,20 @@ package com.eclatian.oss.axis.saksham.client.utils;
 
 import com.eclatian.oss.axis.saksham.client.SakshamManager;
 import com.eclatian.oss.axis.saksham.client.base.Request;
+import com.eclatian.oss.axis.saksham.client.base.SakshamClientException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.security.spec.AlgorithmParameterSpec;
 import java.util.Arrays;
+import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import org.apache.commons.codec.binary.Base64;
@@ -19,10 +27,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * The {@code EncryptionUtil} class provides utility methods for encrypting and decrypting data using AES encryption.
- * It supports AES/CBC/PKCS5PADDING algorithm for encryption and decryption operations.
+ * The {@code EncryptionUtil} class provides utility methods for encrypting and decrypting data using AES encryption. It
+ * supports AES/CBC/PKCS5PADDING algorithm for encryption and decryption operations.
  *
- * <p><strong>Example Usage:</strong></p>
+ * <p>
+ * <strong>Example Usage:</strong></p>
  * <pre>{@code
  * String plainText = "This is a secret message.";
  *
@@ -35,7 +44,8 @@ import org.slf4j.LoggerFactory;
  * System.out.println("Decrypted Text: " + decryptedText);
  * }</pre>
  *
- * <p>This class uses the {@code Cipher} class and AES algorithm for encryption and decryption operations.</p>
+ * <p>
+ * This class uses the {@code Cipher} class and AES algorithm for encryption and decryption operations.</p>
  *
  * @since 1.0
  * @see Cipher
@@ -46,9 +56,8 @@ import org.slf4j.LoggerFactory;
  * @author Abhideep Chakravarty
  */
 public class EncryptionUtil {
-    
+
     protected static final Logger logger = LoggerFactory.getLogger(EncryptionUtil.class.getName());
-    
 
     private static final String ALGORITHM = "AES";
     private static final String CIPHER_ALGORITHAM = "AES/CBC/PKCS5PADDING";
@@ -59,37 +68,40 @@ public class EncryptionUtil {
      *
      * @param plainText the plain text to encrypt
      * @return the encrypted text
-     * @throws Exception if an error occurs during encryption
+     * @throws SakshamClientException if an error occurs during encryption
      */
-    private static String aes128Encrypt(String plainText) throws Exception {
+    private static String aes128Encrypt(String plainText) throws SakshamClientException {
         String encryptedResult = null;
+        try {
 
-        byte[] iv = new byte[]{(byte) 0x8E, 0x12, 0x39, (byte) 0x9C, 0x07,
-            0x72, 0x6F, 0x5A, (byte) 0x8E, 0x12, 0x39, (byte) 0x9C, 0x07,
-            0x72, 0x6F, 0x5A};
+            byte[] iv = new byte[]{(byte) 0x8E, 0x12, 0x39, (byte) 0x9C, 0x07,
+                0x72, 0x6F, 0x5A, (byte) 0x8E, 0x12, 0x39, (byte) 0x9C, 0x07,
+                0x72, 0x6F, 0x5A};
 
-        AlgorithmParameterSpec paramSpec = new IvParameterSpec(iv);
-        /**
-         * Generate a secret key from the hex string as key
-         */
-        SecretKeySpec skeySpec = getSecretKeySpecFromHexString(ALGORITHM, SakshamManager
-            .INSTANCE.getOptions().getKey());
-        /**
-         * Creating a cipher instance with the algorithm and padding
-         */
+            AlgorithmParameterSpec paramSpec = new IvParameterSpec(iv);
+            /**
+             * Generate a secret key from the hex string as key
+             */
+            SecretKeySpec skeySpec = getSecretKeySpecFromHexString(ALGORITHM, SakshamManager.INSTANCE.getOptions().getKey());
+            /**
+             * Creating a cipher instance with the algorithm and padding
+             */
 
-        Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHAM);
-        cipher.init(Cipher.ENCRYPT_MODE, skeySpec, paramSpec);
+            Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHAM);
+            cipher.init(Cipher.ENCRYPT_MODE, skeySpec, paramSpec);
 
-        /**
-         * generating the encrypted result
-         */
-        byte[] encrypted = cipher.doFinal(plainText.getBytes("UTF-8"));
-        // To add iv in encrypted string.
-        byte[] encryptedWithIV = copyIVAndCipher(encrypted, iv);
-        encryptedResult
-            = Base64.encodeBase64String(encryptedWithIV);
+            /**
+             * generating the encrypted result
+             */
+            byte[] encrypted = cipher.doFinal(plainText.getBytes("UTF-8"));
+            // To add iv in encrypted string.
+            byte[] encryptedWithIV = copyIVAndCipher(encrypted, iv);
+            encryptedResult
+                = Base64.encodeBase64String(encryptedWithIV);
 
+        } catch (Exception ex) {
+            throw new SakshamClientException("Could not encrypt the data.", ex);
+        }
         return encryptedResult;
     }
 
@@ -98,11 +110,12 @@ public class EncryptionUtil {
      *
      * @param encryptedText the encrypted text to decrypt
      * @return the decrypted text
-     * @throws Exception if an error occurs during decryption
+     * @throws SakshamClientException if an error occurs during decryption
      */
-    public static String aes128Decrypt(String encryptedText) throws Exception {
-        SecretKeySpec skeySpec = getSecretKeySpecFromHexString(ALGORITHM, SakshamManager
-            .INSTANCE.getOptions().getKey());
+    public static String aes128Decrypt(String encryptedText) throws SakshamClientException {
+
+        String decryptedResult = null;
+        SecretKeySpec skeySpec = getSecretKeySpecFromHexString(ALGORITHM, SakshamManager.INSTANCE.getOptions().getKey());
         byte[] encryptedIVandTextAsBytes = Base64.decodeBase64(encryptedText);
         /**
          * First 16 bytes are always the IV
@@ -112,11 +125,17 @@ public class EncryptionUtil {
             encryptedIVandTextAsBytes.length);
 
 // Decrypt the message
-        Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHAM);
-
-        cipher.init(Cipher.DECRYPT_MODE, skeySpec, new IvParameterSpec(iv));
-        byte[] decryptedTextBytes = cipher.doFinal(ciphertextByte);
-        String decryptedResult = new String(decryptedTextBytes, "UTF-8");
+        Cipher cipher;
+        try {
+            cipher = Cipher.getInstance(CIPHER_ALGORITHAM);
+            cipher.init(Cipher.DECRYPT_MODE, skeySpec, new IvParameterSpec(iv));
+            byte[] decryptedTextBytes = cipher.doFinal(ciphertextByte);
+            decryptedResult = new String(decryptedTextBytes, "UTF-8");
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException 
+            | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException 
+            | UnsupportedEncodingException ex) {
+            throw new SakshamClientException("Could not decrypt the given data.", ex);
+        }
 
         return decryptedResult;
     }
@@ -165,14 +184,15 @@ public class EncryptionUtil {
 
         return os.toByteArray();
     }
-    
+
     /**
      * Retrieves the encrypted body of a {@code Request} object.
      *
      * @param request the {@code Request} object
      * @return the encrypted body
+     * @throws SakshamClientException if an error occurs during the encrypted request body creation.
      */
-    public static String getEncryptedBody(Request request) {
+    public static String getEncryptedBody(Request request) throws SakshamClientException {
         //this.sdkafhdskfh();
         //ChecksumUtil.setChecksum(request);
         logger.debug("Pre enc = " + request);
@@ -184,10 +204,8 @@ public class EncryptionUtil {
             logger.debug("Pre Enc JSON : " + json);
             encryptedBody = EncryptionUtil.aes128Encrypt(json);
         } catch (JsonProcessingException ex) {
-            logger.error(ex.getMessage());
-        } catch (Exception ex) {
-           logger.error(ex.getMessage());
-        }
+            throw new SakshamClientException("failed to create encrypted body for request.", ex);
+        } 
         return encryptedBody;
     }
 }
