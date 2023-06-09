@@ -49,6 +49,10 @@ For detailed usage instructions and code examples, refer to the [documentation](
 
 The full documentation for the Axis Saksham Java Client SDK can be found in the [GitHub Wiki](https://github.com/eclatian/axis-saksham-client-java/wiki).
 
+## Bug Reports and Issues
+
+If you encounter any bugs, issues, or have any questions or suggestions, please feel free to report them on the [GitHub Issues page](https://github.com/eclatian/axis-saksham-client-java/issues). Your feedback is valuable and will help us improve the SDK.
+
 ## Contributing
 
 Contributions to the Axis Saksham Java Client SDK are welcome and encouraged! If you have any bug reports, feature requests, or code improvements, please submit them as issues or pull requests through GitHub.
