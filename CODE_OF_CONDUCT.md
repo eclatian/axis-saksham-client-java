@@ -33,6 +33,6 @@ Project maintainers have the right and responsibility to remove, edit, or reject
 
 ## Attribution
 
-This Code of Conduct is adapted from the [Contributor Covenant](https://www.contributor-covenant.org/version/2/0/code_of_conduct.html), version 2.0.
+This Code of Conduct is adapted from the [Contributor Covenant version 2.0](https://www.contributor-covenant.org/version/2/0/code_of_conduct.html).
 
 
