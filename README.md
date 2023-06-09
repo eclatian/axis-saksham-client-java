@@ -64,4 +64,4 @@ This project is licensed under the Apache 2.0 License. See the LICENSE file for 
 
 We would like to thank the Axis Saksham team for their support and guidance during the development of this SDK.
 
-For any inquiries or support, please contact us at sdk-support@eclatian.com.
+For any inquiries or support, please contact us at oss@eclatian.com.
