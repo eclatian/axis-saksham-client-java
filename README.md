@@ -13,8 +13,8 @@ Add the following dependency to your `pom.xml` file:
 
 ```xml
 <dependency>
-  <groupId>com.example</groupId>
-  <artifactId>axis-saksham-sdk</artifactId>
+  <groupId>com.eclatian.oss</groupId>
+  <artifactId>saksham-rest-client</artifactId>
   <version>1.0.0</version>
 </dependency>
 ```
@@ -24,7 +24,7 @@ Add the following dependency to your `pom.xml` file:
 Add the following dependency to your Gradle build file:
 
 ```groovy
-implementation 'com.example:axis-saksham-sdk:1.0.0'
+implementation 'com.eclatian.oss:saksham-rest-client:1.0.0'
 ```
 
 ## Usage
