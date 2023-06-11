@@ -1,3 +1,8 @@
+[![SonarCloud](https://sonarcloud.io/images/project_badges/sonarcloud-white.svg)](https://sonarcloud.io/summary/new_code?id=eclatian_axis-saksham-client-java)
+[![Technical Debt](https://sonarcloud.io/api/project_badges/measure?project=eclatian_axis-saksham-client-java&metric=sqale_index)](https://sonarcloud.io/summary/new_code?id=eclatian_axis-saksham-client-java)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=eclatian_axis-saksham-client-java&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=eclatian_axis-saksham-client-java)
+[![Duplicated Lines (%)](https://sonarcloud.io/api/project_badges/measure?project=eclatian_axis-saksham-client-java&metric=duplicated_lines_density)](https://sonarcloud.io/summary/new_code?id=eclatian_axis-saksham-client-java)
+
 
 # Axis Saksham Java Client SDK
 
