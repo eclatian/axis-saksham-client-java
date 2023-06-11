@@ -13,8 +13,8 @@ Add the following dependency to your `pom.xml` file:
 
 ```xml
 <dependency>
-  <groupId>com.example</groupId>
-  <artifactId>axis-saksham-sdk</artifactId>
+  <groupId>com.eclatian.oss</groupId>
+  <artifactId>saksham-rest-client</artifactId>
   <version>1.0.0</version>
 </dependency>
 ```
@@ -24,7 +24,7 @@ Add the following dependency to your `pom.xml` file:
 Add the following dependency to your Gradle build file:
 
 ```groovy
-implementation 'com.example:axis-saksham-sdk:1.0.0'
+implementation 'com.eclatian.oss:saksham-rest-client:1.0.0'
 ```
 
 ## Usage
@@ -49,6 +49,10 @@ For detailed usage instructions and code examples, refer to the [documentation](
 
 The full documentation for the Axis Saksham Java Client SDK can be found in the [GitHub Wiki](https://github.com/eclatian/axis-saksham-client-java/wiki).
 
+## Bug Reports and Issues
+
+If you encounter any bugs, issues, or have any questions or suggestions, please feel free to report them on the [GitHub Issues page](https://github.com/eclatian/axis-saksham-client-java/issues). Your feedback is valuable and will help us improve the SDK.
+
 ## Contributing
 
 Contributions to the Axis Saksham Java Client SDK are welcome and encouraged! If you have any bug reports, feature requests, or code improvements, please submit them as issues or pull requests through GitHub.
@@ -64,4 +68,4 @@ This project is licensed under the Apache 2.0 License. See the LICENSE file for 
 
 We would like to thank the Axis Saksham team for their support and guidance during the development of this SDK.
 
-For any inquiries or support, please contact us at sdk-support@eclatian.com.
+For any inquiries or support, please contact us at oss@eclatian.com.

@@ -55,7 +55,7 @@ By contributing to the Axis Saksham Java Client SDK, you agree that your contrib
 
 ## Contact
 
-If you have any further questions, suggestions, or need assistance with the contribution process, feel free to reach out to us at sdk-support@example.com. We appreciate your involvement and are here to help!
+If you have any further questions, suggestions, or need assistance with the contribution process, feel free to reach out to us at oss@example.com. We appreciate your involvement and are here to help!
 
 We thank you for your valuable contributions to the Axis Saksham Java Client SDK.
 
