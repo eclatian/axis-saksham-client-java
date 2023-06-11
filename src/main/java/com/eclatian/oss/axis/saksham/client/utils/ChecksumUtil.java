@@ -135,7 +135,7 @@ public class ChecksumUtil {
            throw new SakshamClientException("Could not generate checksum value for the given object.",
                e);
         }
-        logger.debug("Checksum = " + finalChkSum.toString().trim());
+        logger.debug("Checksum = {}", finalChkSum.toString().trim());
         return String.valueOf(
             encodeCheckSumWithSHA256(
                 finalChkSum.toString().trim()));
@@ -217,7 +217,7 @@ public class ChecksumUtil {
     public static String encodeCheckSumWithSHA256(String data) throws NoSuchAlgorithmException {
         MessageDigest md;
         StringBuilder sb = new StringBuilder();
-        logger.debug("Checksum for encoding: " + data);
+        logger.debug("Checksum for encoding: {}", data);
 
         md = MessageDigest.getInstance("MD5");
         md.update(data.getBytes(StandardCharsets.UTF_8));

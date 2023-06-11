@@ -56,7 +56,7 @@ import lombok.ToString;
  * System.out.println(request.toString());
  * }</pre>
  *
- * @author: Abhideep Chakravarty
+ * @author Abhideep Chakravarty
  */
 @Getter
 @Setter

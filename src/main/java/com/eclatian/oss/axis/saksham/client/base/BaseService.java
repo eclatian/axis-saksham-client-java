@@ -75,9 +75,7 @@ public abstract class BaseService<K extends Request, V extends Response> {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
     private final IRestClient restClient = new HttpClientRestImpl();
-    protected AParser parser = new JacksonParser();
-    
-    
+    protected AParser<Request, Response> parser = new JacksonParser();
 
     /**
      * Triggers the Axis request and returns the response.
@@ -92,7 +90,7 @@ public abstract class BaseService<K extends Request, V extends Response> {
             this.validateRequest(request);
             String requestJson = this.restClient.getJsonRequest(request);
             String url = SakshamManager.INSTANCE.getOptions().getEnv().getApiRootURL() + this.getAPIPath();
-            logger.debug("Target URL = " + url);
+            logger.debug("Target URL = {}", url);
             String responseString = this.restClient.makeAPIRequest(url, requestJson);
             response = this.parseObject(responseString);
         } catch (SakshamClientException ex) {
@@ -100,22 +98,21 @@ public abstract class BaseService<K extends Request, V extends Response> {
         }
         return response;
     }
-    
+
     /**
      * Parses the response JSON and returns the corresponding response object.
      *
      * <p>
-     * The method uses the configured {@link AParser} implementation to parse the response JSON
-     * and converts it to the appropriate response object type.
+     * The method uses the configured {@link AParser} implementation to parse the response JSON and converts it to the
+     * appropriate response object type.
      * </p>
      *
      * @param responseJson The response JSON string.
      * @return The parsed response object.
-     * @throws SakshamClientException If an error occurs during parsing or if the response contains an 
-     * error message.
+     * @throws SakshamClientException If an error occurs during parsing or if the response contains an error message.
      */
     protected V parseObject(String responseJson) throws SakshamClientException {
-        V response = null;
+        V response;
         try {
             response = (V) parser.getResponseObject(responseJson, getResponseType());
         } catch (SakshamClientException ex) {
@@ -126,19 +123,15 @@ public abstract class BaseService<K extends Request, V extends Response> {
         }
         return response;
     }
-    
-    
 
     /**
      * Retrieves the response type of the service.
      *
      * @return The response type class.
      */
-    protected Class<V> getResponseType() {
+    protected Class getResponseType() {
         return (Class<V>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[1];
     }
-
-    
 
     /**
      * Retrieves the API path for the REST client.
@@ -148,7 +141,7 @@ public abstract class BaseService<K extends Request, V extends Response> {
     protected String getAPIPath() {
         AxisAPI annotation = this.getClass().getAnnotation(AxisAPI.class);
         String apiPath = annotation.path();
-        logger.debug("API Path for " + this.getClass().getTypeName() + " is " + apiPath);
+        logger.debug("API Path for {0} is {1} ", this.getClass().getTypeName(), apiPath);
         return apiPath;
     }
 

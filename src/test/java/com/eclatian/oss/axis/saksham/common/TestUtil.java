@@ -61,7 +61,7 @@ public class TestUtil {
                 .hideRequestRawJson(true)
                 .build();
         } catch (FileNotFoundException ex) {
-            
+            //Log the error in your system.
         }
 
         SakshamManager.INSTANCE.initialize(pOptions);

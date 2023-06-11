@@ -188,8 +188,8 @@ public class InitializationOptions {
         }
 
         /**
-         * Sets the flag for auto-populating sub-headers. By default it is set to true. If you make it false,
-         * you need to populate the {@link SubHeader} in the request object. 
+         * Sets the flag for auto-populating SubHeader. By default it is set to true. If you make it false,
+         * you need to populate the {@linkplain com.eclatian.oss.axis.saksham.client.base.SubHeader SubHeader} in the request object. 
          *
          * @param autoPopulateSubHeader the flag for auto-populating sub-headers
          * @return the builder instance

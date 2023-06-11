@@ -48,28 +48,28 @@ import lombok.ToString;
  *   </li>
  *   <li>{@link #beneCode}:
  *     <ul>
- *       <li>Annotation: {@link javax.validation.constraints.NotNull}</li>
+ *       <li>Annotation: {@link jakarta.validation.constraints.NotNull}</li>
  *       <li>Description: Represents the code associated with the beneficiary.</li>
  *       <li>Importance: This annotation indicates that the beneficiary code cannot be null, helping to ensure data integrity and prevent potential errors.</li>
  *     </ul>
  *   </li>
  *   <li>{@link #beneName}:
  *     <ul>
- *       <li>Annotation: {@link javax.validation.constraints.NotNull}</li>
+ *       <li>Annotation: {@link jakarta.validation.constraints.NotNull}</li>
  *       <li>Description: Represents the name of the beneficiary.</li>
  *       <li>Importance: This annotation indicates that the beneficiary name cannot be null, helping to ensure data integrity and prevent potential errors.</li>
  *     </ul>
  *   </li>
  *   <li>{@link #beneAccNum}:
  *     <ul>
- *       <li>Annotation: {@link javax.validation.constraints.NotNull}</li>
+ *       <li>Annotation: {@link jakarta.validation.constraints.NotNull}</li>
  *       <li>Description: Represents the account number of the beneficiary.</li>
  *       <li>Importance: This annotation indicates that the beneficiary account number cannot be null, helping to ensure data integrity and prevent potential errors.</li>
  *     </ul>
  *   </li>
  *   <li>{@link #beneIfscCode}:
  *     <ul>
- *       <li>Annotation: {@link javax.validation.constraints.NotNull}</li>
+ *       <li>Annotation: {@link jakarta.validation.constraints.NotNull}</li>
  *       <li>Description: Represents the IFSC code of the beneficiary's bank.</li>
  *       <li>Importance: This annotation indicates that the beneficiary IFSC code cannot be null, helping to ensure data integrity and prevent potential errors.</li>
  *     </ul>

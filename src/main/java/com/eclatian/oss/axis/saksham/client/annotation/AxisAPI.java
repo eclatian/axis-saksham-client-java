@@ -41,7 +41,7 @@ import java.lang.annotation.Target;
  * }
  * }</pre>
  *
- * @author: Abhideep Chakravarty
+ * @author Abhideep Chakravarty
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

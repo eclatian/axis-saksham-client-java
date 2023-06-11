@@ -59,7 +59,7 @@ import lombok.ToString;
  * System.out.println(response.toString());
  * }</pre>
  *
- * @author: Abhideep Chakravarty
+ * @author Abhideep Chakravarty
  */
 @Getter
 @Setter

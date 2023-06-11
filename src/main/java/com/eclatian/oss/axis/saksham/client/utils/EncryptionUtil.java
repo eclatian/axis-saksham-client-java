@@ -215,13 +215,13 @@ public class EncryptionUtil {
     public static String getEncryptedBody(Request request) throws SakshamClientException {
         //this.sdkafhdskfh();
         //ChecksumUtil.setChecksum(request);
-        logger.debug("Pre enc = " + request);
+        logger.debug("Pre enc = {}", request);
         ObjectMapper obj = new ObjectMapper();
         String json = null;
         String encryptedBody = null;
         try {
             json = obj.writeValueAsString(request);
-            logger.debug("Pre Enc JSON : " + json);
+            logger.debug("Pre Enc JSON : {}", json);
             encryptedBody = EncryptionUtil.aes128Encrypt(json);
         } catch (JsonProcessingException ex) {
             throw new SakshamClientException("failed to create encrypted body for request.", ex);

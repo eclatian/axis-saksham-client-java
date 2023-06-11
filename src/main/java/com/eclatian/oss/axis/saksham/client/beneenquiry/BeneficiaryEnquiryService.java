@@ -50,7 +50,7 @@ import com.eclatian.oss.axis.saksham.client.base.BaseService;
  * System.out.println(response.toString());
  * }</pre>
  *
- * @author: Abhideep Chakravarty
+ * @author Abhideep Chakravarty
  */
 @AxisAPI(path = "/payee-mgmt/beneficiary-enquiry")
 public class BeneficiaryEnquiryService extends BaseService<BeneficiaryEnquiryRequest,

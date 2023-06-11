@@ -59,22 +59,22 @@ import org.slf4j.LoggerFactory;
  *
  * <p>
  * The {@code getEncryptedRequestJson} method converts a request object to a JSON string for an encrypted request. It
- * builds a JSON template with placeholders for the root tag, subheader, encrypted tag, and encrypted data. It replaces
+ * builds a JSON template with placeholders for the root tag, SubHeader, encrypted tag, and encrypted data. It replaces
  * the placeholders with the actual values from the request object and calls the necessary utility methods to set the
  * checksum and encrypt the body. The final JSON string is returned.
  * </p>
  *
  * <p>
- * The {@code getSubHeaderJson} method retrieves the subheader JSON from the request object. If the
- * autoPopulateSubHeader flag is enabled in the {@link SakshamManager} options, it automatically populates the subheader
- * fields. Otherwise, it retrieves the subheader from the request object. The subheader is then converted to JSON using
+ * The {@code getSubHeaderJson} method retrieves the SubHeader JSON from the request object. If the
+ * autoPopulateSubHeader flag is enabled in the {@link SakshamManager} options, it automatically populates the SubHeader
+ * fields. Otherwise, it retrieves the SubHeader from the request object. The SubHeader is then converted to JSON using
  * the {@code getJson} method.
  * </p>
  *
  * <p>
- * The {@code autoPopulateSubHeader} method is used to automatically populate the subheader fields when the
+ * The {@code autoPopulateSubHeader} method is used to automatically populate the SubHeader fields when the
  * {@code autoPopulateSubHeader} flag is enabled. It creates a new {@link SubHeader} object, sets the required fields
- * like serviceRequestId, serviceRequestVersion, channelId, and requestUUID, and returns the populated subheader.
+ * like serviceRequestId, serviceRequestVersion, channelId, and requestUUID, and returns the populated SubHeader.
  * </p>
  *
  * <p>
@@ -125,7 +125,7 @@ import org.slf4j.LoggerFactory;
  * @see Logger
  * @see LoggerFactory
  */
-public class JacksonParser extends AParser {
+public class JacksonParser extends AParser<Request, Response> {
 
     /**
      * The logger instance for logging messages.
@@ -151,7 +151,7 @@ public class JacksonParser extends AParser {
      * Converts a request object to an encrypted JSON request string.
      *
      * <p>
-     * The method builds a JSON template with placeholders for the root tag, subheader, encrypted tag, 
+     * The method builds a JSON template with placeholders for the root tag, SubHeader, encrypted tag, 
      * and encrypted
      * data. It replaces the placeholders with the actual values from the request object and calls the necessary
      * utility
@@ -170,35 +170,35 @@ public class JacksonParser extends AParser {
             + "\"ENC_TAG\": \"ENC_DATA\""
             + "}"
             + "}";
-        logger.debug("Json: " + json);
+        logger.debug("Json: {}", json);
         try {
             ChecksumUtil.setChecksum(request);
         } catch (Exception ex) {
             java.util.logging.Logger.getLogger(BaseService.class.getName()).log(Level.SEVERE, null, ex);
         }
         String encData = EncryptionUtil.getEncryptedBody(request);
-        logger.debug("ENC: " + encData);
+        logger.debug("ENC: {}", encData);
         String subHeaderJson = this.getSubHeaderJson(request);
         JsonTagsData td = TagsUtil.getTags(request.getClass());
         json = json.replace("ROOT_TAG", td.getRootTag())
             .replace("ENC_TAG", td.getEncTag())
             .replace("ENC_DATA", encData)
             .replace("SUB_HEADER_DATA", subHeaderJson);
-        logger.debug("Final JSON: " + json);
+        logger.debug("Final JSON: {}", json);
         return json;
     }
 
     /**
-     * Retrieves the subheader JSON from the request object.
+     * Retrieves the SubHeader JSON from the request object.
      *
      * <p>
      * If the autoPopulateSubHeader flag is enabled in the {@link SakshamManager} options, it automatically populates
-     * the subheader fields. Otherwise, it retrieves the subheader from the request object. The subheader is then
+     * the SubHeader fields. Otherwise, it retrieves the SubHeader from the request object. The SubHeader is then
      * converted to JSON using the {@code getJson} method.
      * </p>
      *
      * @param request The Axis request object.
-     * @return The subheader JSON string.
+     * @return The SubHeader JSON string.
      * @throws SakshamClientException If an error occurs during the conversion.
      */
     private String getSubHeaderJson(Request request) throws SakshamClientException {
@@ -218,15 +218,15 @@ public class JacksonParser extends AParser {
     }
 
     /**
-     * Automatically populates the subheader fields.
+     * Automatically populates the SubHeader fields.
      *
      * <p>
      * When the autoPopulateSubHeader flag is enabled, this method creates a new {@link SubHeader} object and sets the
      * required fields such as serviceRequestId, serviceRequestVersion, channelId, and requestUUID. It returns the
-     * populated subheader.
+     * populated SubHeader.
      * </p>
      *
-     * @return The populated subheader object.
+     * @return The populated SubHeader object.
      */
     private SubHeader autoPopulateSubHeader() {
         SubHeader sub = new SubHeader();
@@ -243,7 +243,7 @@ public class JacksonParser extends AParser {
      * Converts a request object to a hybrid JSON request string.
      *
      * <p>
-     * The method builds a JSON template with placeholders for the root tag, subheader, body tag, and encrypted tag. It
+     * The method builds a JSON template with placeholders for the root tag, SubHeader, body tag, and encrypted tag. It
      * replaces the placeholders with the actual values from the request object and calls the necessary utility methods
      * to set the checksum, convert the body to JSON, and encrypt the body. The final JSON string is returned.
      * </p>
@@ -261,7 +261,7 @@ public class JacksonParser extends AParser {
             + "\"ENC_TAG\": \"ENC_DATA\""
             + "}"
             + "}";
-        logger.debug("Json: " + json);
+        logger.debug("Json: {}", json);
         try {
             ChecksumUtil.setChecksum(request);
         } catch (Exception ex) {
@@ -283,7 +283,7 @@ public class JacksonParser extends AParser {
             .replace("SUB_HEADER_DATA", subHeaderJson)
             .replace("ENC_TAG", td.getEncTag())
             .replace("ENC_DATA", encData);
-        logger.debug("Final JSON: " + json);
+        logger.debug("Final JSON: {}", json);
         return json;
     }
 
@@ -335,7 +335,7 @@ public class JacksonParser extends AParser {
             throw new SakshamClientException("Could not convert the decrypted JSON to " + type.getName() 
                 + " object.", ex);
         }
-        logger.debug("Response object: " + res.toString());
+        logger.debug("Response object: {}", res.toString());
         return res;
     }
 
@@ -368,7 +368,7 @@ public class JacksonParser extends AParser {
         } catch (Exception ex) {
             throw new SakshamClientException("Could not decrypt the JSON data for " + td.getEncTag(), ex);
         }
-        logger.debug("Decrypted JSON: " + decryptedJson);
+        logger.debug("Decrypted JSON: {}", decryptedJson);
         return decryptedJson;
     }
 
@@ -399,7 +399,7 @@ public class JacksonParser extends AParser {
         }
         String dataJson = jsonNode.get(td.getBodyTag()).toString();
 
-        logger.debug("Data JSON: " + dataJson);
+        logger.debug("Data JSON: {}", dataJson);
         return dataJson;
     }
 

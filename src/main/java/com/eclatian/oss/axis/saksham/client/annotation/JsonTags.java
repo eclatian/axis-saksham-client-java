@@ -31,7 +31,7 @@ import java.lang.annotation.Target;
 
 
 /**
- * The {@code JsonTags} annotation is used to annotate a subclass of {@link Request} or {@link Response} class
+ * The {@code JsonTags} annotation is used to annotate a subclass of {@linkplain com.eclatian.oss.axis.saksham.client.base.Request Request} or {@link com.eclatian.oss.axis.saksham.client.base.Response Response} class
  * with JSON tags information.
  * It is a custom annotation that can be applied to classes.
  *
@@ -47,7 +47,7 @@ import java.lang.annotation.Target;
  * }
  * }</pre>
  *
- * @author: Abhideep Chakravarty
+ * @author Abhideep Chakravarty
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

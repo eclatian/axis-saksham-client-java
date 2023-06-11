@@ -81,7 +81,8 @@ public enum AxisRestClient {
      * Retrieves the CloseableHttpClient instance for HTTP requests.
      *
      * @return The CloseableHttpClient instance.
-     * @throws com.eclatian.oss.axis.saksham.client.base.SakshamClientException
+     * @throws SakshamClientException Throws an exception if it can't create a {@link CloseableHttpClient}
+     * client object.
      */
     public CloseableHttpClient getHttpClient() throws SakshamClientException {
         if (this.httpClient == null) {

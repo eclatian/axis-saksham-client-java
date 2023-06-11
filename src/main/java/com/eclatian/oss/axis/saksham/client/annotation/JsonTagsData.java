@@ -50,7 +50,7 @@ import lombok.ToString;
  * // Output: JsonTagsData(rootTag=data, bodyTag=body, encTag=encryptedData)
  * }</pre>
  *
- * @author: Abhideep Chakravarty
+ * @author Abhideep Chakravarty
  */
 @Getter
 @Setter

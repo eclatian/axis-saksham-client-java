@@ -56,22 +56,22 @@ public class HttpClientRestImpl extends BaseRestClientImpl {
         // Create and send a request
         HttpPost httpPost = new HttpPost(url);
         httpPost.setHeader("Content-Type", "application/json");
-        logger.debug("Client id = " + SakshamManager.INSTANCE.getOptions().getClientId());
-        logger.debug("Client secret = " + SakshamManager.INSTANCE.getOptions().getClientSecret());
+        logger.debug("Client id = {}", SakshamManager.INSTANCE.getOptions().getClientId());
+        logger.debug("Client secret = {}", SakshamManager.INSTANCE.getOptions().getClientSecret());
         httpPost.setHeader("X-IBM-Client-Id", SakshamManager.INSTANCE.getOptions().getClientId());
         httpPost.setHeader("X-IBM-Client-Secret", SakshamManager.INSTANCE.getOptions().getClientSecret());
         httpPost.setEntity(new StringEntity(requestJson, ContentType.APPLICATION_JSON));
-        logger.debug("Request URL = " + httpPost.toString());
+        logger.debug("Request URL = {}", httpPost.toString());
         HttpResponse response = null;
         try {
             response = client.execute(httpPost);
         } catch (IOException ex) {
             throw new SakshamClientException("Could not make a successful API call. Verify your IP address is whitelisted and you are using mTLS properly.", ex);
         }
-        logger.debug("Status code = " + response.getStatusLine().getStatusCode());
+        logger.debug("Status code = {}", response.getStatusLine().getStatusCode());
         this.validateResponse(response);
         String responseString = this.convertHttpResponseToString(response);
-        logger.debug("Valid response String: " + responseString);
+        logger.debug("Valid response String: {}", responseString);
 
         return responseString;
     }
@@ -101,7 +101,7 @@ public class HttpClientRestImpl extends BaseRestClientImpl {
      */
     private void convert503ToException(HttpResponse httpResponse) throws SakshamClientException {
         String responseString = this.convertHttpResponseToString(httpResponse);
-        logger.debug("Error 503 response String: " + responseString);
+        logger.debug("Error 503 response String: {}", responseString);
         String sb = "httpCode: CODE | httpMessage: MSG | errorCode: ERR | moreInformation: INFO";
         sb = sb.replace("CODE", parser.getJsonValue(responseString, "httpCode"))
                 .replace("MSG", parser.getJsonValue(responseString, "httpMessage"))
