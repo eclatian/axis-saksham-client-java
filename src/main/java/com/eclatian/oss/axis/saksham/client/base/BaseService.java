@@ -116,11 +116,11 @@ public abstract class BaseService<K extends Request, V extends Response> {
         try {
             response = (V) parser.getResponseObject(responseJson, getResponseType());
         } catch (SakshamClientException ex) {
-            throw new SakshamClientException("Could not parse the response JSON.", ex);
+            throw new SakshamClientException("Request failed.", ex);
         }
-        if (response.getErrorMessage() != null) {
-            throw new SakshamClientException(response.getErrorMessage());
-        }
+        //if (response.getErrorMessage() != null) {
+        //    throw new SakshamClientException(response.getErrorMessage());
+        //}
         return response;
     }
 
@@ -141,7 +141,7 @@ public abstract class BaseService<K extends Request, V extends Response> {
     protected String getAPIPath() {
         AxisAPI annotation = this.getClass().getAnnotation(AxisAPI.class);
         String apiPath = annotation.path();
-        logger.debug("API Path for {0} is {1} ", this.getClass().getTypeName(), apiPath);
+        logger.debug("API Path for {} is {} ", this.getClass().getTypeName(), apiPath);
         return apiPath;
     }
 

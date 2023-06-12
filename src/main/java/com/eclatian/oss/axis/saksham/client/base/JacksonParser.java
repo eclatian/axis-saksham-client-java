@@ -18,7 +18,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
+ /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
@@ -138,8 +138,7 @@ public class JacksonParser extends AParser<Request, Response> {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
-     * Constructs a new JacksonParser and configures the coercion of empty strings to empty values for
-     * certain data
+     * Constructs a new JacksonParser and configures the coercion of empty strings to empty values for certain data
      * types.
      */
     public JacksonParser() {
@@ -151,10 +150,8 @@ public class JacksonParser extends AParser<Request, Response> {
      * Converts a request object to an encrypted JSON request string.
      *
      * <p>
-     * The method builds a JSON template with placeholders for the root tag, SubHeader, encrypted tag, 
-     * and encrypted
-     * data. It replaces the placeholders with the actual values from the request object and calls the necessary
-     * utility
+     * The method builds a JSON template with placeholders for the root tag, SubHeader, encrypted tag, and encrypted
+     * data. It replaces the placeholders with the actual values from the request object and calls the necessary utility
      * methods to set the checksum and encrypt the body. The final JSON string is returned.
      * </p>
      *
@@ -212,7 +209,7 @@ public class JacksonParser extends AParser<Request, Response> {
         try {
             json = this.getJson(subHeader);
         } catch (SakshamClientException ex) {
-            throw new SakshamClientException("Could not created SubHeader json.",ex);
+            throw new SakshamClientException("Could not created SubHeader json.", ex);
         }
         return json;
     }
@@ -327,15 +324,26 @@ public class JacksonParser extends AParser<Request, Response> {
     public Response getResponseObject(String json, Class type) throws SakshamClientException {
         JsonTagsData td = TagsUtil.getTags(type);
         String decryptedJson = getDecryptedJsonString(json, type, td);
-        String dataJson = getDataJsonString(decryptedJson, type, td);
+        String dataJson = null;
         Response res = null;
+        String errorMessage = null;
+        try {
+            dataJson = getDataJsonString(decryptedJson, type, td);
+        } catch (SakshamClientException ex) {
+            errorMessage = ex.getMessage();
+            dataJson = "{\"data\":\"\"}"; //Assign epmty body in case of error.
+        }
+
         try {
             res = (Response) objectMapper.readValue(dataJson, type);
         } catch (JsonProcessingException ex) {
-            throw new SakshamClientException("Could not convert the decrypted JSON to " + type.getName() 
+            throw new SakshamClientException("Could not convert the decrypted JSON to " + type.getName()
                 + " object.", ex);
         }
-        logger.debug("Response object: {}", res.toString());
+        if (errorMessage != null) {
+            res.setErrorMessage(errorMessage);
+        }
+        logger.debug("Response object: {}", res);
         return res;
     }
 
@@ -376,10 +384,8 @@ public class JacksonParser extends AParser<Request, Response> {
      * Retrieves the data JSON from the decrypted JSON string.
      *
      * <p>
-     * The method reads the decrypted JSON string, extracts the status field, and checks if it is "F", 
-     * indicating an
-     * error. If an error occurs, a {@link SakshamClientException} is thrown with the error message.
-     * Otherwise, it
+     * The method reads the decrypted JSON string, extracts the status field, and checks if it is "F", indicating an
+     * error. If an error occurs, a {@link SakshamClientException} is thrown with the error message. Otherwise, it
      * retrieves the data JSON using the provided body tag and returns it.
      * </p>
      *
@@ -407,8 +413,7 @@ public class JacksonParser extends AParser<Request, Response> {
      * Reads a JSON key from the JSON string.
      *
      * <p>
-     * The method reads the JSON string as a string key-value pair map using the 
-     * {@link ObjectMapper#readTree} method
+     * The method reads the JSON string as a string key-value pair map using the {@link ObjectMapper#readTree} method
      * and returns the corresponding JSON node based on the provided key.
      * </p>
      *
@@ -431,8 +436,7 @@ public class JacksonParser extends AParser<Request, Response> {
      * Converts an object to a {@link LinkedHashMap} representation.
      *
      * <p>
-     * The method uses the {@link ObjectMapper#convertValue} method to convert the object to a
-     * {@link LinkedHashMap}
+     * The method uses the {@link ObjectMapper#convertValue} method to convert the object to a {@link LinkedHashMap}
      * representation.
      * </p>
      *
