@@ -24,6 +24,7 @@ import com.eclatian.oss.axis.saksham.client.SakshamManager;
 import com.eclatian.oss.axis.saksham.client.base.AParser;
 import com.eclatian.oss.axis.saksham.client.base.JacksonParser;
 import com.eclatian.oss.axis.saksham.client.base.Request;
+import com.eclatian.oss.axis.saksham.client.base.Response;
 import com.eclatian.oss.axis.saksham.client.base.SakshamClientException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +41,7 @@ import org.slf4j.LoggerFactory;
 public abstract class BaseRestClientImpl implements IRestClient {
 
     protected final Logger logger = LoggerFactory.getLogger(this.getClass().getName());
-    protected AParser parser = new JacksonParser();
+    protected AParser<Request, Response> parser = new JacksonParser();
 
     /**
      * Generates the JSON representation of the request object.

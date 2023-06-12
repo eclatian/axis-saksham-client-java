@@ -26,6 +26,7 @@ package com.eclatian.oss.axis.saksham.client.utils;
 
 import com.eclatian.oss.axis.saksham.client.annotation.JsonTags;
 import com.eclatian.oss.axis.saksham.client.annotation.JsonTagsData;
+import com.eclatian.oss.axis.saksham.client.base.Request;
 
 
 /**
@@ -65,7 +66,7 @@ public class TagsUtil {
      * @param request the class from which to retrieve the tags
      * @return the {@code JsonTagsData} object containing the retrieved tags
      */
-    public static JsonTagsData getTags(Class request) {
+    public static JsonTagsData getTags(Class<? extends Request> request) {
         JsonTags tagsAnnotation = (JsonTags) request.getAnnotation(JsonTags.class);
         JsonTagsData td = new JsonTagsData();
         td.setBodyTag(tagsAnnotation.body());

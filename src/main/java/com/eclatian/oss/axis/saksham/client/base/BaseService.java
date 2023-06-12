@@ -114,13 +114,10 @@ public abstract class BaseService<K extends Request, V extends Response> {
     protected V parseObject(String responseJson) throws SakshamClientException {
         V response;
         try {
-            response = (V) parser.getResponseObject(responseJson, getResponseType());
+            response = (V) parser.getResponseObject(responseJson, (Class<Response>) getResponseType());
         } catch (SakshamClientException ex) {
             throw new SakshamClientException("Request failed.", ex);
         }
-        //if (response.getErrorMessage() != null) {
-        //    throw new SakshamClientException(response.getErrorMessage());
-        //}
         return response;
     }
 
@@ -129,7 +126,7 @@ public abstract class BaseService<K extends Request, V extends Response> {
      *
      * @return The response type class.
      */
-    protected Class getResponseType() {
+    protected Class<V> getResponseType() {
         return (Class<V>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[1];
     }
 

@@ -18,7 +18,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
+ /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
@@ -30,6 +30,7 @@ import com.eclatian.oss.axis.saksham.client.base.SakshamClientException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -81,7 +82,17 @@ public class EncryptionUtil {
 
     private static final String ALGORITHM = "AES";
     private static final String CIPHER_ALGORITHAM = "AES/CBC/PKCS5PADDING";
-    //private static final String KEY = "29C1EB633ECAB0CA0F52B588AE92EA31";
+
+    /**
+     *
+     * The {@code EncryptionUtil} class provides utility methods for encryption and decryption operations. It is
+     * designed as a utility class with a private constructor to prevent instantiation.
+     *
+     * @since 1.0
+     */
+    private EncryptionUtil() {
+
+    }
 
     /**
      * Encrypts the given plain text using AES-128 encryption with a provided key.
@@ -102,7 +113,8 @@ public class EncryptionUtil {
             /**
              * Generate a secret key from the hex string as key
              */
-            SecretKeySpec skeySpec = getSecretKeySpecFromHexString(ALGORITHM, SakshamManager.INSTANCE.getOptions().getKey());
+            SecretKeySpec skeySpec = getSecretKeySpecFromHexString(ALGORITHM,
+                SakshamManager.INSTANCE.getOptions().getKey());
             /**
              * Creating a cipher instance with the algorithm and padding
              */
@@ -151,8 +163,8 @@ public class EncryptionUtil {
             cipher.init(Cipher.DECRYPT_MODE, skeySpec, new IvParameterSpec(iv));
             byte[] decryptedTextBytes = cipher.doFinal(ciphertextByte);
             decryptedResult = new String(decryptedTextBytes, "UTF-8");
-        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException 
-            | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException 
+        } catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException
+            | InvalidAlgorithmParameterException | IllegalBlockSizeException | BadPaddingException
             | UnsupportedEncodingException ex) {
             throw new SakshamClientException("Could not decrypt the given data.", ex);
         }
@@ -195,12 +207,17 @@ public class EncryptionUtil {
      * @param encryptedText the encrypted text
      * @param iv the initialization vector (IV)
      * @return the byte array containing IV and cipher
-     * @throws Exception if an error occurs during the copying process
+     * @throws SakshamClientException if an error occurs during the copying process
      */
-    private static byte[] copyIVAndCipher(byte[] encryptedText, byte[] iv) throws Exception {
+    private static byte[] copyIVAndCipher(byte[] encryptedText, byte[] iv) throws SakshamClientException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        os.write(iv);
-        os.write(encryptedText);
+        try {
+            os.write(iv);
+            os.write(encryptedText);
+        } catch (IOException ex) {
+            throw new SakshamClientException("Data ciphering failed", ex);
+        }
+        
 
         return os.toByteArray();
     }
@@ -213,8 +230,7 @@ public class EncryptionUtil {
      * @throws SakshamClientException if an error occurs during the encrypted request body creation.
      */
     public static String getEncryptedBody(Request request) throws SakshamClientException {
-        //this.sdkafhdskfh();
-        //ChecksumUtil.setChecksum(request);
+        
         logger.debug("Pre enc = {}", request);
         ObjectMapper obj = new ObjectMapper();
         String json = null;
@@ -225,7 +241,7 @@ public class EncryptionUtil {
             encryptedBody = EncryptionUtil.aes128Encrypt(json);
         } catch (JsonProcessingException ex) {
             throw new SakshamClientException("failed to create encrypted body for request.", ex);
-        } 
+        }
         return encryptedBody;
     }
 }

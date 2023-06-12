@@ -18,7 +18,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
+ /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
@@ -27,6 +27,7 @@ package com.eclatian.oss.axis.saksham.client.utils;
 import com.eclatian.oss.axis.saksham.client.base.AParser;
 import com.eclatian.oss.axis.saksham.client.base.JacksonParser;
 import com.eclatian.oss.axis.saksham.client.base.Request;
+import com.eclatian.oss.axis.saksham.client.base.Response;
 import com.eclatian.oss.axis.saksham.client.base.SakshamClientException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -40,15 +41,16 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
- * The {@code ChecksumUtil} class provides utility methods for generating and validating checksums.
- * It includes methods for generating a checksum based on a given request map and encoding the checksum with SHA256.
- * The class also provides a method for setting the checksum on a {@link Request} object.
+ * The {@code ChecksumUtil} class provides utility methods for generating and validating checksums. It includes methods
+ * for generating a checksum based on a given request map and encoding the checksum with SHA256. The class also provides
+ * a method for setting the checksum on a {@link Request} object.
  *
- * <p>Checksums are used for data integrity verification and are commonly used in data transmission and storage.</p>
+ * <p>
+ * Checksums are used for data integrity verification and are commonly used in data transmission and storage.</p>
  *
- * <p><strong>Example Usage:</strong></p>
+ * <p>
+ * <strong>Example Usage:</strong></p>
  * <pre>{@code
  * LinkedHashMap<String, Object> requestMap = new LinkedHashMap<>();
  * // Populate the requestMap with data
@@ -61,7 +63,8 @@ import org.slf4j.LoggerFactory;
  * ChecksumUtil.setChecksum(request);
  * }</pre>
  *
- * <p>This class uses the {@code AParser} and {@code JacksonParser} classes for parsing the request map.</p>
+ * <p>
+ * This class uses the {@code AParser} and {@code JacksonParser} classes for parsing the request map.</p>
  *
  * @since 1.0
  * @author Abhideep Chakravarty
@@ -69,16 +72,28 @@ import org.slf4j.LoggerFactory;
 public class ChecksumUtil {
 
     protected static final Logger logger = LoggerFactory.getLogger(ChecksumUtil.class.getName());
-    private static final AParser PARSER = new JacksonParser();
+    private static final AParser<Request, Response> PARSER = new JacksonParser();
+
+    /**
+     *
+     * The {@code ChecksumUtil} class provides utility methods for generating checksums. It is designed as a utility
+     * class with a private constructor to prevent instantiation.
+     *
+     * @since 1.0
+     */
+    private ChecksumUtil() {
+
+    }
 
     /**
      * Generates a checksum based on the provided request map.
      *
      * @param requestMap the request map to generate the checksum from
      * @return the generated checksum
-     * @throws Exception if an error occurs during checksum generation
+     * @throws SakshamClientException if an error occurs during checksum generation
      */
-    private static String generateCheckSum(LinkedHashMap<String, Object> requestMap) throws Exception {
+    private static String generateCheckSum(LinkedHashMap<String, Object> requestMap) 
+        throws SakshamClientException {
         StringBuilder finalChkSum = new StringBuilder();
         StringBuilder keys = new StringBuilder();
         try {
@@ -132,13 +147,17 @@ public class ChecksumUtil {
                 }
             }
         } catch (Exception e) {
-           throw new SakshamClientException("Could not generate checksum value for the given object.",
-               e);
+            throw new SakshamClientException("Could not generate checksum value for the given object.",
+                e);
         }
-        logger.debug("Checksum = {}", finalChkSum.toString().trim());
-        return String.valueOf(
-            encodeCheckSumWithSHA256(
-                finalChkSum.toString().trim()));
+        logger.debug("Checksum = {}", finalChkSum);
+        try {
+            return String.valueOf(
+                encodeCheckSumWithSHA256(
+                    finalChkSum.toString().trim()));
+        } catch (NoSuchAlgorithmException ex) {
+            throw new SakshamClientException("Failed to create checksum.", ex);
+        }
 
     }
 
@@ -227,7 +246,7 @@ public class ChecksumUtil {
         for (byte b : hashBytes) {
             sb.append(String.format("%02x", b));
         }
-        
+
         return sb.toString();
 
     }
@@ -236,8 +255,7 @@ public class ChecksumUtil {
      * Sets the checksum on the provided request object.
      *
      * @param request the request object to set the checksum on
-     * @throws Exception if an error occurs during checksum generation or setting the checksum on the
-     * request object
+     * @throws Exception if an error occurs during checksum generation or setting the checksum on the request object
      */
     public static void setChecksum(Request request) throws Exception {
         request.setChecksum(null);

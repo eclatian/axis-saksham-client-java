@@ -61,7 +61,7 @@ public class HttpClientRestImpl extends BaseRestClientImpl {
         httpPost.setHeader("X-IBM-Client-Id", SakshamManager.INSTANCE.getOptions().getClientId());
         httpPost.setHeader("X-IBM-Client-Secret", SakshamManager.INSTANCE.getOptions().getClientSecret());
         httpPost.setEntity(new StringEntity(requestJson, ContentType.APPLICATION_JSON));
-        logger.debug("Request URL = {}", httpPost.toString());
+        logger.debug("Request URL = {}", httpPost);
         HttpResponse response = null;
         try {
             response = client.execute(httpPost);
