@@ -58,7 +58,6 @@ import org.slf4j.LoggerFactory;
  *
  * <p>Note: The enum follows the singleton pattern, and {@code INSTANCE} should be used to access the client instance.</p>
  *
- * @see OkHttpClient
  * @see CloseableHttpClient
  * @see SakshamManager
  * @see IllegalArgumentException

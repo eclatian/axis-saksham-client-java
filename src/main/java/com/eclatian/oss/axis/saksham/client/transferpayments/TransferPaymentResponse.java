@@ -44,11 +44,6 @@ import lombok.ToString;
     body = "data")
 @JsonInclude(JsonInclude.Include.ALWAYS)
 public class TransferPaymentResponse extends Response {
-
-    /**
-     * The data field for the response.
-     */
-    private Object data;
     
 }
 

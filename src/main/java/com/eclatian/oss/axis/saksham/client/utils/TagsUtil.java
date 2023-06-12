@@ -18,7 +18,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-/*
+ /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
@@ -28,12 +28,12 @@ import com.eclatian.oss.axis.saksham.client.annotation.JsonTags;
 import com.eclatian.oss.axis.saksham.client.annotation.JsonTagsData;
 import com.eclatian.oss.axis.saksham.client.base.Request;
 
-
 /**
- * The {@code TagsUtil} class provides utility methods for retrieving tags from a given class using annotations.
- * It supports retrieving tags using the {@code JsonTags} annotation.
+ * The {@code TagsUtil} class provides utility methods for retrieving tags from a given class using annotations. It
+ * supports retrieving tags using the {@code JsonTags} annotation.
  *
- * <p><strong>Example Usage:</strong></p>
+ * <p>
+ * <strong>Example Usage:</strong></p>
  * <pre>{@code
  * // Define a class with JsonTags annotation
  * \@JsonTags(root = "data", body = "content", encrypted = true)
@@ -48,8 +48,9 @@ import com.eclatian.oss.axis.saksham.client.base.Request;
  * System.out.println("Encrypted Tag: " + tagsData.getEncTag());
  * }</pre>
  *
- * <p>This class uses reflection to retrieve the {@code JsonTags} annotation from a given class and returns
- * the corresponding tags using the {@code JsonTagsData} object.</p>
+ * <p>
+ * This class uses reflection to retrieve the {@code JsonTags} annotation from a given class and returns the
+ * corresponding tags using the {@code JsonTagsData} object.</p>
  *
  * @since 1.0
  * @see JsonTags
@@ -59,7 +60,18 @@ import com.eclatian.oss.axis.saksham.client.base.Request;
  * @author Abhideep Chakravarty
  */
 public class TagsUtil {
-    
+
+    /**
+     *
+     * The {@code TagsUtil} class provides utility methods for working with JSON tags and annotations. 
+     * It is designed as a utility class with a private constructor to prevent instantiation.
+     *
+     * @since 1.0
+     */
+    private TagsUtil() {
+
+    }
+
     /**
      * Retrieves the tags from the given class using the {@code JsonTags} annotation.
      *

@@ -35,43 +35,43 @@ public class TxnStatus {
     /**
      * The corporate code associated with the transaction.
      */
-    public String corpCode;
+    private String corpCode;
     
     /**
      * The description of the transaction status.
      */
-    public String statusDescription;
+    private String statusDescription;
     
     /**
      * The batch number of the transaction.
      */
-    public String batchNo;
+    private String batchNo;
     
     /**
      * The unique transaction reference number (UTR).
      * This can be of various types, such as String or Integer, hence it is represented as an Object.
      */
-    public Object utrNo;
+    private Object utrNo;
     
     /**
      * The date when the transaction was processed.
      */
-    public String processingDate;
+    private String processingDate;
     
     /**
      * The response code of the transaction.
      */
-    public String responseCode;
+    private String responseCode;
     
     /**
      * The customer reference number (CRN) associated with the transaction.
      */
-    public String crn;
+    private String crn;
     
     /**
      * The current status of the transaction.
      */
-    public String transactionStatus;
+    private String transactionStatus;
     
     
 }

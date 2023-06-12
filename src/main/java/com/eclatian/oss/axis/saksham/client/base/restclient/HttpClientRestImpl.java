@@ -89,6 +89,7 @@ public class HttpClientRestImpl extends BaseRestClientImpl {
             case 503:
                 this.convert503ToException(httpResponse);
                 break;
+            default : //Will update based on future scenarios.
             // Add more cases for other status codes if needed
         }
     }

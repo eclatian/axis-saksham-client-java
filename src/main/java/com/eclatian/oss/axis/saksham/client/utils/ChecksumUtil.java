@@ -92,7 +92,7 @@ public class ChecksumUtil {
      * @return the generated checksum
      * @throws SakshamClientException if an error occurs during checksum generation
      */
-    private static String generateCheckSum(LinkedHashMap<String, Object> requestMap) 
+    private static String generateCheckSum(LinkedHashMap<String, Object> requestMap)
         throws SakshamClientException {
         StringBuilder finalChkSum = new StringBuilder();
         StringBuilder keys = new StringBuilder();
@@ -168,50 +168,77 @@ public class ChecksumUtil {
      * @return the checksum generated from the inner level 2 map
      */
     private static String getInnerLevel2Map(Object entryInnLvl2) {
-
         StringBuilder finalChkSum = new StringBuilder();
-
         StringBuilder keys = new StringBuilder();
+
         if (entryInnLvl2 instanceof List) {
             List<Object> tempLst = ((List) entryInnLvl2);
             if (!CollectionUtils.isEmpty(tempLst) && (tempLst.get(0) instanceof Map)) {
-                List<? extends Map<String, Object>> innerObjectMap
-                    = (List<? extends Map<String, Object>>) entryInnLvl2;
-                for (Map<String, Object> innerMap : innerObjectMap) {
-                    for (Entry<? extends String, ? extends Object> entryInn : innerMap.entrySet()) {
-
-                        keys.append(entryInn.getKey());
-                        finalChkSum.append(
-                            validateInfo(String.valueOf(entryInn.getValue())));
-                    }
-                }
+                List<? extends Map<String, Object>> innerObjectMap = (List<? extends Map<String, Object>>)
+                    entryInnLvl2;
+                finalChkSum.append(processListWithInnerMaps(innerObjectMap, keys));
             } else if (!CollectionUtils.isEmpty(tempLst)) {
-                for (Object strValues : tempLst) {
-                    finalChkSum.append(
-                        validateInfo(
-                            String.valueOf(strValues)));
-                }
+                finalChkSum.append(processList(tempLst));
             }
         } else if (entryInnLvl2 instanceof Map) {
-            Map<? extends String, ? extends Object> innerObjectMap2
-                = (Map<? extends String, ? extends Object>) entryInnLvl2;
-            for (Entry<? extends String, ? extends Object> entryInn : innerObjectMap2.entrySet()) {
-
-                keys.append(entryInn.getKey());
-
-                finalChkSum.append(
-                    validateInfo(
-                        String.valueOf(entryInn.getValue())
-                    ));
-            }
+            Map<? extends String, ? extends Object> innerObjectMap2 = (Map<? extends String, ? extends Object>)
+            entryInnLvl2;
+            finalChkSum.append(processMap(innerObjectMap2, keys));
         } else {
-            finalChkSum.append(
-                validateInfo(
-                    String.valueOf(entryInnLvl2)));
+            finalChkSum.append(validateInfo(String.valueOf(entryInnLvl2)));
         }
 
         return finalChkSum.toString();
+    }
 
+    /**
+     * Processes the list with inner maps.
+     *
+     * @param innerObjectMap The list containing inner maps.
+     * @param keys The StringBuilder to store the keys.
+     * @return The final checksum as a StringBuilder.
+     */
+    private static StringBuilder processListWithInnerMaps(List<? extends Map<String, Object>> innerObjectMap,
+        StringBuilder keys) {
+        StringBuilder finalChkSum = new StringBuilder();
+        for (Map<String, Object> innerMap : innerObjectMap) {
+            for (Entry<? extends String, ? extends Object> entryInn : innerMap.entrySet()) {
+                keys.append(entryInn.getKey());
+                finalChkSum.append(validateInfo(String.valueOf(entryInn.getValue())));
+            }
+        }
+        return finalChkSum;
+    }
+
+    /**
+     * Processes the list.
+     *
+     * @param tempLst The list of values.
+     * @return The final checksum as a StringBuilder.
+     */
+    private static StringBuilder processList(List<Object> tempLst) {
+        StringBuilder finalChkSum = new StringBuilder();
+        for (Object strValues : tempLst) {
+            finalChkSum.append(validateInfo(String.valueOf(strValues)));
+        }
+        return finalChkSum;
+    }
+
+    /**
+     * Processes the map.
+     *
+     * @param innerObjectMap2 The map containing key-value pairs.
+     * @param keys The StringBuilder to store the keys.
+     * @return The final checksum as a StringBuilder.
+     */
+    private static StringBuilder processMap(Map<? extends String, ? extends Object> innerObjectMap2,
+        StringBuilder keys) {
+        StringBuilder finalChkSum = new StringBuilder();
+        for (Entry<? extends String, ? extends Object> entryInn : innerObjectMap2.entrySet()) {
+            keys.append(entryInn.getKey());
+            finalChkSum.append(validateInfo(String.valueOf(entryInn.getValue())));
+        }
+        return finalChkSum;
     }
 
     /**

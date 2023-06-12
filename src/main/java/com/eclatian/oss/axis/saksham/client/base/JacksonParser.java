@@ -331,7 +331,7 @@ public class JacksonParser extends AParser<Request, Response> {
             dataJson = getDataJsonString(decryptedJson, type, td);
         } catch (SakshamClientException ex) {
             errorMessage = ex.getMessage();
-            dataJson = "{\"data\":\"\"}"; //Assign epmty body in case of error.
+            dataJson = ""; //Assign epmty body in case of error.
         }
 
         try {
