@@ -20,7 +20,7 @@
  */
 package com.eclatian.oss.axis.saksham.client.base;
 
-import java.util.LinkedHashMap;
+import java.util.Map;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -78,9 +78,9 @@ public abstract class AParser<K extends Request, V extends Response> {
      * Converts a request object to a map representation.
      *
      * @param request The request object to convert to a map.
-     * @return A linked hash map representing the request object.
+     * @return A map representing the request object.
      */
-    public abstract LinkedHashMap<String, Object> getMap(Object request);
+    public abstract Map<String, Object> getMap(Object request);
 
     /**
      * Generates JSON from a given data object.

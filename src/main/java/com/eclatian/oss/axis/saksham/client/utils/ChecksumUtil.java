@@ -103,42 +103,9 @@ public class ChecksumUtil {
             for (Map.Entry<String, Object> entry : requestMap.entrySet()) {
                 if (!entry.getKey().equals("checksum")) {
                     if (entry.getValue() instanceof List) {
-                        List<Object> tempLst = ((List) entry.getValue());
-                        if (!CollectionUtils.isEmpty(tempLst) && (tempLst.get(0) instanceof Map)) {
-                            List<? extends Map<String, Object>> innerObjectMap
-                                = (List<? extends Map<String, Object>>) entry.getValue();
-
-                            for (Map<String, Object> innerMap : innerObjectMap) {
-
-                                for (Entry<? extends String, ? extends Object> entryInn
-                                    : innerMap.entrySet()) {
-
-                                    keys.append(entryInn.getKey());
-
-                                    finalChkSum.append(
-                                        getInnerLevel2Map(
-                                            entryInn.getValue()));
-
-                                }
-                            }
-                        } else if (!CollectionUtils.isEmpty(tempLst)) {
-                            for (Object strValues : tempLst) {
-                                finalChkSum.append(
-                                    validateInfo(
-                                        String.valueOf(strValues)));
-                            }
-                        }
+                        getChecksumForList(entry, keys, finalChkSum);
                     } else if (entry.getValue() instanceof Map) {
-                        Map<? extends String, ? extends Object> innerObjectMap2
-                            = (Map<? extends String, ? extends Object>) entry.getValue();
-                        for (Entry<? extends String, ? extends Object> entryInn
-                            : innerObjectMap2.entrySet()) {
-                            keys.append(entryInn.getKey());
-                            finalChkSum.append(
-                                validateInfo(
-                                    String.valueOf(entryInn.getValue())));
-
-                        }
+                        getChecksumForMap(entry, keys, finalChkSum);
                     } else {
                         finalChkSum.append(
                             validateInfo(
@@ -159,6 +126,49 @@ public class ChecksumUtil {
             throw new SakshamClientException("Failed to create checksum.", ex);
         }
 
+    }
+
+    private static void getChecksumForList(Entry<String, Object> entry, StringBuilder keys, 
+        StringBuilder finalChkSum) {
+        List<Object> tempLst = ((List) entry.getValue());
+        if (!CollectionUtils.isEmpty(tempLst) && (tempLst.get(0) instanceof Map)) {
+            List<? extends Map<String, Object>> innerObjectMap
+                = (List<? extends Map<String, Object>>) entry.getValue();
+            
+            for (Map<String, Object> innerMap : innerObjectMap) {
+                
+                for (Entry<? extends String, ? extends Object> entryInn
+                    : innerMap.entrySet()) {
+                    
+                    keys.append(entryInn.getKey());
+                    
+                    finalChkSum.append(
+                        getInnerLevel2Map(
+                            entryInn.getValue()));
+                    
+                }
+            }
+        } else if (!CollectionUtils.isEmpty(tempLst)) {
+            for (Object strValues : tempLst) {
+                finalChkSum.append(
+                    validateInfo(
+                        String.valueOf(strValues)));
+            }
+        }
+    }
+
+    private static void getChecksumForMap(Entry<String, Object> entry, StringBuilder keys, 
+        StringBuilder finalChkSum) {
+        Map<? extends String, ? extends Object> innerObjectMap2
+            = (Map<? extends String, ? extends Object>) entry.getValue();
+        for (Entry<? extends String, ? extends Object> entryInn
+            : innerObjectMap2.entrySet()) {
+            keys.append(entryInn.getKey());
+            finalChkSum.append(
+                validateInfo(
+                    String.valueOf(entryInn.getValue())));
+            
+        }
     }
 
     /**
@@ -287,7 +297,7 @@ public class ChecksumUtil {
     public static void setChecksum(Request request) throws Exception {
         request.setChecksum(null);
 
-        LinkedHashMap<String, Object> dataMap = PARSER.getMap(request);
+        LinkedHashMap<String, Object> dataMap = (LinkedHashMap<String, Object>) PARSER.getMap(request);
         request.setChecksum(ChecksumUtil.generateCheckSum(dataMap));
 
     }
