@@ -79,7 +79,7 @@ public class TagsUtil {
      * @return the {@code JsonTagsData} object containing the retrieved tags
      */
     public static JsonTagsData getTags(Class<? extends Request> request) {
-        JsonTags tagsAnnotation = (JsonTags) request.getAnnotation(JsonTags.class);
+        JsonTags tagsAnnotation = request.getAnnotation(JsonTags.class);
         JsonTagsData td = new JsonTagsData();
         td.setBodyTag(tagsAnnotation.body());
         td.setEncTag(tagsAnnotation.encrypted());
