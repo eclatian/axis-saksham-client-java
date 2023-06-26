@@ -46,6 +46,12 @@
             <organization>Eclatian</organization>
             <organizationUrl>https://eclatian.com</organizationUrl>
         </developer>
+        <developer>
+            <name>Jitendra Kumar</name>
+            <email>kumar.jitendra0201@gmail.com</email>
+            <organization>Bosch</organization>
+            <organizationUrl>https://www.bosch.com</organizationUrl>
+        </developer>
     </developers>
     
     <scm>
