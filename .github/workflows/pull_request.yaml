@@ -10,6 +10,15 @@ jobs:
     name: Build and Test
     runs-on: self-hosted
 
+    env:
+      axis-saksham-cert-passphrase: ${{ secrets.AXIS_SAKSHAM_CERT_PASSPHRASE }}
+      axis-saksham-channelId: ${{ secrets.AXIS_SAKSHAM_CHANNELID }}
+      axis-saksham-clientId: ${{ secrets.AXIS_SAKSHAM_CLIENTID }}
+      axis-saksham-corpCode: ${{ secrets.AXIS_SAKSHAM_CORPCODE }}
+      axis-saksham-key: ${{ secrets.AXIS_SAKSHAM_KEY }}
+      axis-saksham-secret: ${{ secrets.AXIS_SAKSHAM_SECRET }}
+      axis-saksham-cert-path: ${{ secrets.AXIS_SAKSHAM_CERT_PATH }}
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
