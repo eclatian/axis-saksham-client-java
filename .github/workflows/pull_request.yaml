@@ -9,6 +9,7 @@ jobs:
   build-and-test:
     name: Build and Test
     runs-on: self-hosted
+    environment: develop
 
     env:
       axis-saksham-cert-passphrase: ${{ secrets.AXIS_SAKSHAM_CERT_PASSPHRASE }}
