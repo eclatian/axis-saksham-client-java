@@ -24,6 +24,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Run unit tests
-        run: mvn clean test -Daxis-saksham-cert-passphrase=${{ secrets.AXIS_SAKSHAM_CERT_PASSPHRASE }} -Daxis-saksham-channelId=${{ secrets.AXIS_SAKSHAM_CHANNELID }} \
-        -Daxis-saksham-clientId=${{ secrets.AXIS_SAKSHAM_CLIENTID }} -Daxis-saksham-corpCode=${{ secrets.AXIS_SAKSHAM_CORPCODE }} \
-        -Daxis-saksham-key=${{ secrets.AXIS_SAKSHAM_KEY }} -Daxis-saksham-secret=${{ secrets.AXIS_SAKSHAM_SECRET }} -Daxis-saksham-cert-path=${{ secrets.AXIS_SAKSHAM_CERT_PATH }}
+        run: |
+         mvn clean test -Daxis-saksham-cert-passphrase=${{ secrets.AXIS_SAKSHAM_CERT_PASSPHRASE }} -Daxis-saksham-channelId=${{ secrets.AXIS_SAKSHAM_CHANNELID }} \
+         -Daxis-saksham-clientId=${{ secrets.AXIS_SAKSHAM_CLIENTID }} -Daxis-saksham-corpCode=${{ secrets.AXIS_SAKSHAM_CORPCODE }} \
+         -Daxis-saksham-key=${{ secrets.AXIS_SAKSHAM_KEY }} -Daxis-saksham-secret=${{ secrets.AXIS_SAKSHAM_SECRET }} -Daxis-saksham-cert-path=${{ secrets.AXIS_SAKSHAM_CERT_PATH }}
