@@ -26,8 +26,8 @@ jobs:
 
       - name: Run unit tests
         run: |
-         echo "value: ${{ secrets.TEST }}"
+         echo "github runner path: $GITHUB_WORKSPACE"
          mvn clean test -Daxis-saksham-cert-passphrase=${{ secrets.AXIS_SAKSHAM_CERT_PASSPHRASE }} -Daxis-saksham-channelId=${{ secrets.AXIS_SAKSHAM_CHANNELID }} \
          -Daxis-saksham-clientId=${{ secrets.AXIS_SAKSHAM_CLIENTID }} -Daxis-saksham-corpCode=${{ secrets.AXIS_SAKSHAM_CORPCODE }} \
-         -Daxis-saksham-key=${{ secrets.AXIS_SAKSHAM_KEY }} -Daxis-saksham-secret=${{ secrets.AXIS_SAKSHAM_SECRET }} -Daxis-saksham-cert-path=${{ secrets.AXIS_SAKSHAM_CERT_PATH }} -Dtest=${{ secrets.TEST }}
+         -Daxis-saksham-key=${{ secrets.AXIS_SAKSHAM_KEY }} -Daxis-saksham-secret=${{ secrets.AXIS_SAKSHAM_SECRET }} -Daxis-saksham-cert-path=${{ secrets.AXIS_SAKSHAM_CERT_PATH }}
         
